@@ -1,4 +1,4 @@
-setwd("U:/Vyzkum/Diplomka")
+setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
 source(file="createSequence.R")
 source(file="PsychopyColourSequencer.R")
 source(file="PsychopyLeftRightSequencer.R")
@@ -57,4 +57,4 @@ for (i in listOfPossibUsers){
      }
 }
 
-listOfPossibUsers = c(1,3,4,6,7,9,11,14,15,17,18,19,22,23,28,30,31,32,33,35,38,40)
+listOfPossibUsers = c(1,3,4,6,7,9,11,14,15,17,18,19,22,23,28,30,31,32,33,35,38,40,41,43,44,46,47,48,49,50,51,52,53,56,58,61,62,63,65,66,68,69,70,666)
