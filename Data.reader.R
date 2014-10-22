@@ -62,7 +62,7 @@ better_log_table <-function(table){
 }
 better_log_table(log_table)
 
-atan2(as.numeric(tail(log_table[Faze==1],1)$cil3pozice.z),as.numeric(tail(log_table[Faze==1],1)$cil3pozice.x))
+#atan2(as.numeric(tail(log_table[Faze==1],1)$cil3pozice.z),as.numeric(tail(log_table[Faze==1],1)$cil3pozice.x))
 
 file = NULL
 

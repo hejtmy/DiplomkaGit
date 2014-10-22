@@ -48,6 +48,12 @@ createSimpleProband = function(i,n=1){
           tablelr <- createSequenceLeftRight(i)
           write.csv(tablelr,expflr,quote=F,row.names=F)
      }
+     
+     if (n==1){
+          expflpr <- file(paste(c(i,"-pureleftright.csv"),sep="",collapse=""))
+          tablelr <- createSequenceLeftRight(i)
+          write.csv(tablelr,expflr,quote=F,row.names=F)
+     }
 
 }
 
@@ -55,6 +61,18 @@ for (i in listOfPossibUsers){
      for (n in 1:4){
           createSimpleProband(i,n)
      }
+}
+
+for (i in listOfPossibUsers){
+     expflpr <- file(paste(c(i,"-pureleftright.csv"),sep="",collapse=""))
+     tablelr <- createSequencePureLeftRight(i)
+     write.csv(tablelr,expflpr,quote=F,row.names=F)
+}
+
+for (i in listOfPossibUsers){
+     expflfb <- file(paste(c(i,"-frontback.csv"),sep="",collapse=""))
+     tablelr <- createSequenceFrontBack(i)
+     write.csv(tablelr,expflfb,quote=F,row.names=F)
 }
 
 listOfPossibUsers = c(1,3,4,6,7,9,11,14,15,17,18,19,22,23,28,30,31,32,33,35,38,40,41,43,44,46,47,48,49,50,51,52,53,56,58,61,62,63,65,66,68,69,70,666)
