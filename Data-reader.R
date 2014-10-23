@@ -1,14 +1,6 @@
-setwd("U:/Vyzkum/Diplomka/")
-library(ggplot2)
-library(data.table)
-
-data.dir = "U:/Vyzkum/Diplomka/data/Unity/"
 files = list.files(data.dir, full.names = T)
-
 read_file <- function (file, key){
-
      #searches for the log part
-     
      if(any(grepl(key, file))){
           name=gsub(data.dir,"",file)
           #removes the txt part
@@ -32,6 +24,7 @@ read_file <- function (file, key){
           
      }
 }
+
 
 log_table = do.call("rbind",lapply(files, read_file, key="LOG"))
 test_table= do.call("rbind",lapply(files, read_file, key="TEST"))
@@ -60,21 +53,6 @@ better_log_table <-function(table){
           table[,(column):=NULL]
      }
 }
+
 better_log_table(log_table)
-
 #atan2(as.numeric(tail(log_table[Faze==1],1)$cil3pozice.z),as.numeric(tail(log_table[Faze==1],1)$cil3pozice.x))
-
-file = NULL
-
-if(grep(key,file)){ 
-     print ("hey")
-}
-i=1
-for (column in columns_position){
-     i<-i+1
-     #expr <- parse(text = paste0(colum, ":=(a)"))
-     #log_table[,(column):=substring(log_table[[column]],1,nchar(log_table[[column]])-1)]    
-}
-class(log_table[,Hracpozice[1]])
-head(log_table[,sapply(Hracpozice, "[", 1)])
-class(log_table[,get("Hracpozice")])
