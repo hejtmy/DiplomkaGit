@@ -1,5 +1,6 @@
 library(binhf)
 
+#helper function for switching and noSwitching
 switching<-function(oldVec){
      newVec=shift(oldVec,1,dir='left')    
      whereNewArena=grepl("Arena",newVec)
@@ -17,6 +18,8 @@ switching<-function(oldVec){
      return(list(list1,list2))
 }
 
+
+#helper fucntion for deciding correct answers
 trefa <- function(table){
      
      angleDiff=table[,UhlovaVzdalenostCile]
@@ -39,7 +42,9 @@ trefa <- function(table){
      }    
 }
 
+#makes each angle difference an absolute value
 test_table[,UhlovaVzdalenostCile:=abs(UhlovaVzdalenostCile)]
+#list of 
 seznam=c('CilArena1Uhel','CilArena2Uhel','CilAI1Uhel','CilAI2Uhel')
 #creates small table from the log table with only the last log line 
 #(the one where the phase ended, therefor the one closest to the probands answer
@@ -48,6 +53,7 @@ smallTable=rbind(log_table[,tail(.SD,1),by=list(id,test.phase,Faze)])
 smallTable=smallTable[test.phase %in% c('F3','F4','F5')]
 #columnsToDelete = c('')
 #smallTable[,.SD:=NULL,.SDcols=columnsToDelete]
+
 #merges the information for future use
 setkey(test_table,id,test.phase,Faze)
 setkey(smallTable,id,test.phase,Faze)
@@ -55,14 +61,14 @@ newTable = merge(test_table,smallTable)
 #deletes the help table
 smallTable<-NULL
 
+#makes decisions about correct and incorrect answers
 newTable[,c('correct.ans','diff.sec.closest'):=trefa(.SD),by=list(id,Faze,test.phase)]
-table(newTable[,correct.ans,by=list(id,test.phase)])
 
 #adds a reaction Time column
 newTable[,reactionTime:=CasKliknuti-CasZadani]
 newTable[,c('did.switch','whereTo'):=switching(.SD$JmenoCile),by=list(id,test.phase)]
 
-useTable = newTable[correct.ans=='CORRECT',list(id,test.phase,Faze,JmenoOrientacnihoBodu,correct.ans,reactionTime,did.switch,whereTo)]
+useTable = newTable[correct.ans!='INCORRECT',list(id,test.phase,Faze,JmenoOrientacnihoBodu,JmenoCile,correct.ans,reactionTime,did.switch,whereTo)]
 
 #testing purposes
 #oldVec = newTable[test.phase=="F3",JmenoCile]
