@@ -1,4 +1,4 @@
-createSequence <- function (units,iterations,begin="",bool=FALSE){
+createSequence <- function (units,iterations,begin="",samePair=F,bool=FALSE){
      
      #creates matrix with possible iterations
      matrix = matrix(data=iterations,nrow=units,ncol=units)
@@ -13,8 +13,10 @@ createSequence <- function (units,iterations,begin="",bool=FALSE){
      discardedMatrix2 = matrix(data=0,nrow=units,ncol=units)
      
      #fills in the matrices# 
-     for (n in 1:units){
-          matrix[n,n]=0
+     if (!samePair){
+          for (n in 1:units){
+               matrix[n,n]=0
+          }
      }
      #if we want to incoporate beginning of the sequence
      if (nchar(begin)>0){
@@ -137,8 +139,8 @@ createLeftRightIteration <- function (sequence,units,iterations){
      return(mySequence)    
 }
 
-createTurnSequence = function (units,iterations){
-     seq2=createSequence(units,iterations)
+createTurnSequence = function (units,iterations,samePairX=F){
+     seq2=createSequence(units,iterations,samePair=samePairX)
      seq1=createLeftRightIteration(seq2,units,iterations)
      mySequence=""
      for (i in 1:nchar(seq1)){
