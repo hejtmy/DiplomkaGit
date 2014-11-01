@@ -1,7 +1,7 @@
 createSequenceLeftRight <- function (num){
      set.seed(num)
      suffix="1600x999.jpg"
-     possib=seqen(0,355,5)
+     possib=seq(0,355,5)
      seqen=sample(possib)
      len = sample(c(20,25,30),72,replace=T)
      table = data.frame(angle=integer(length(seqen)),image=character(length(seqen)),answer=character(length(seqen)),stringsAsFactors=F)
