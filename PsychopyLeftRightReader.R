@@ -1,8 +1,28 @@
-setwd("U:/Vyzkum/Diplomka")
 library(data.table)
-table=read.csv("1_Experiment_2014_X_15_2316.csv")
-dt = as.data.table(table[c(1:3,16:26))
-dt[,key_resp_2.corr:=lapply(c(answer,key_resp_2.keys),checkCorr)]
+library(ggplot2)
+setwd("U:/Vyzkum/Diplomka/Data/Psychopy/LeftRight/Ver3/")
+
+data.dir = "U:/Vyzkum/Diplomka/Data/Psychopy/Colour/Ver3/"
+
+data.dir = "C:/Lukas/Vyzkum/Diplomka/DiplomkaGit/dataPsy/"
+
+files = list.files(data.dir, full.names = T)
+file=files[1]
+read_file <- function (file){
+     if(any(grepl(".csv", file))){
+          mytable = read.csv(file)
+          #deletes rows from the instruction part
+          prep_table = as.data.table(mytable[nchar(as.character(mytable$answer_image))==0,c(2:4,21:29)])
+          return (prep_table)
+     }    
+}
+
+leftright_table= do.call("rbind",lapply(files, read_file))
+
+setnames(leftright_table,c("key_resp_2.keys","key_resp_2.corr","key_resp_2.rt","participant"),c("klavesa","spravnaOdpoved","reactionTime","id"))
+
+
+table(leftright_table[,spravnaOdpoved,by=id])
 
 checkCorr <- function (key1,key2){
      
@@ -12,3 +32,5 @@ checkCorr <- function (key1,key2){
           return (0)
      }
 }
+
+leftright_table[,key_resp_2.corr:=lapply(c(answer,key_resp_2.keys),checkCorr)]

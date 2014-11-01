@@ -1,11 +1,37 @@
-setwd("U:/Dimplomka/PsychoPyExp/data/")
+setwd("U:/Vyzkum/Diplomka/Data/Psychopy/Colour/Ver3/")
 library(data.table)
+library(ggplot2)
 
-table = read.csv("999_Experiment_2014_X_13_2053.csv")
-dt = as.data.table(table[-c(1:2),c(1:7,13:17)])
-dt[,reaction_time:=strsplit(substring(as.character(mouse_3.time),2,nchar(as.character(mouse_3.time))-1),",")]
-dt[,reaction_time:=as.numeric(sapply(reaction_time,"[",1))]
-sapply(dt,class)
+data.dir = "U:/Vyzkum/Diplomka/Data/Psychopy/Colour/Ver3/"
+
+files = list.files(data.dir, full.names = T)
+
+read_file <- function (file){
+     if(any(grepl(".csv", file))){
+          table = read.csv(file)
+          prep_table = as.data.table(table[-c(1),c(1:3,10:11,14:18)])
+          return (prep_table)
+     }    
+}
+
+colour_table = do.call("rbind",lapply(files, read_file))
+
+setnames(colour_table,c("key_resp_4.keys","key_resp_4.rt","participant"),c("key","reactionTime","id"))
+colour_table[,key:=as.character(key)]
+colour_table[,key:=substring(key,3,nchar(key)-2)]
+colour_table[,reactionTime:=as.character(reactionTime)]
+
+colour_table[,reactionTime:=strsplit(substring(reactionTime,2,nchar(reactionTime)-1),",")]
+colour_table[,reactionTime:=as.numeric(sapply(reactionTime,"[",1))]
+
+setkey(colour_table,id)
+
+colour_table[,mean(reactionTime,na.rm=T),by=list(id,session)]
+
+sapply(colour_table,class)
 
 
-dt[,mean(reaction_time,na.rm=T),by=letter]
+dt[,mean(reactionTime,na.rm=T),by=letter]
+
+
+
