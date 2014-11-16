@@ -2,12 +2,11 @@ library(data.table)
 library(ggplot2)
 setwd("U:/Vyzkum/Diplomka/Data/Psychopy/LeftRight/Ver3/")
 
-data.dir = "U:/Vyzkum/Diplomka/Data/Psychopy/Colour/Ver3/"
+data.dir = "U:/Vyzkum/Diplomka/Data/Psychopy/LeftRight/Ver3/"
 
 data.dir = "C:/Lukas/Vyzkum/Diplomka/DiplomkaGit/dataPsy/"
 
 files = list.files(data.dir, full.names = T)
-file=files[1]
 read_file <- function (file){
      if(any(grepl(".csv", file))){
           mytable = read.csv(file)

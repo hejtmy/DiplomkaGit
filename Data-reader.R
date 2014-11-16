@@ -1,12 +1,18 @@
-files = list.files(data.dir, full.names = T)
+files = list.files(data.dir, full.names = T, recursive=T)
 read_file <- function (file, key){
      #searches for the log part
      if(any(grepl(key, file))){
           name=gsub(data.dir,"",file)
           #removes the txt part
-          name=substring(name,0,nchar(name)-4)
+          name=substring(name,1,nchar(name)-4)
+          
+          #gets a folder name to paste
+          #folder=strsplit(name,"/",fixed=T)[[1]][2]
+          #folder.name=paste(c("/",folder,"/"),sep="",collapse="")
+          #name=gsub(folder.name,"",name)
+          
           #creates a list with some values
-          basic_columns=strsplit(name,"_",fixed=T)[[1]]
+          basic_columns=c(strsplit(name,"_",fixed=T)[[1]])
           
           #splits the name of the file into variables and bindes them into a data.frame
           basic_table= rbind(basic_columns)

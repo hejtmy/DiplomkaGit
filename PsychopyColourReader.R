@@ -1,10 +1,7 @@
-setwd("U:/Vyzkum/Diplomka/Data/Psychopy/Colour/Ver3/")
 library(data.table)
-library(ggplot2)
+library(binhf)
 
-data.dir = "U:/Vyzkum/Diplomka/Data/Psychopy/Colour/Ver3/"
 
-files = list.files(data.dir, full.names = T)
 
 read_file <- function (file){
      if(any(grepl(".csv", file))){
@@ -15,24 +12,37 @@ read_file <- function (file){
           
 }
 
-colour_table = do.call("rbind",lapply(files, read_file))
+#function to prepare the table
+colour_prep_table <-function(dir){
+    
+     files = list.files(data.dir, full.names = T)
+     
+     colour_table = do.call("rbind",lapply(files, read_file))
+     #renames to more comprehensive
+     setnames(colour_table,c("key_resp_4.keys","key_resp_4.rt","participant"),c("key","reactionTime","id"))
+     
+     setkey(colour_table,session,id)
+     colour_table[,letter.prev:=shift(as.character(letter),1),by=list(session,id)]
+     colour_table[,colour.prev:=shift(as.character(colour),1),by=list(session,id)]
+     
+     #cleans up the key column
+     colour_table[,key:=as.character(key)]
+     colour_table[,key:=substring(key,3,nchar(key)-2)]
+     colour_table[,reactionTime:=as.character(reactionTime)]
+     
+     #cleans up the reaction time column
+     colour_table[,reactionTime:=strsplit(substring(reactionTime,2,nchar(reactionTime)-1),",")]
+     colour_table[,reactionTime:=as.numeric(sapply(reactionTime,"[",1))]
+     
+     #removes the empty rows
+     colour_table=colour_table[letter!='']
+     return(colour_table)
+}
 
-setnames(colour_table,c("key_resp_4.keys","key_resp_4.rt","participant"),c("key","reactionTime","id"))
-colour_table[,key:=as.character(key)]
-colour_table[,key:=substring(key,3,nchar(key)-2)]
-colour_table[,reactionTime:=as.character(reactionTime)]
-
-colour_table[,reactionTime:=strsplit(substring(reactionTime,2,nchar(reactionTime)-1),",")]
-colour_table[,reactionTime:=as.numeric(sapply(reactionTime,"[",1))]
-
-setkey(colour_table,id)
-
-colour_table[,mean(reactionTime,na.rm=T),by=list(id,session)]
-
-sapply(colour_table,class)
-
-
-dt[,mean(reactionTime,na.rm=T),by=letter]
-
-
-
+colour_remove_long_reactions <-function(table,max.time){
+     pre=nrow(table)
+     table=table[reactionTime<max.time]
+     post=nrow(table)
+     print(paste(c(as.character(pre-post),"zaznamù smazáno"),sep=" ",collapse=" "))
+     return(table)
+}
