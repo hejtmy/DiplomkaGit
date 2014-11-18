@@ -1,4 +1,3 @@
-files = list.files(data.dir, full.names = T, recursive=T)
 read_file <- function (file, key){
      #searches for the log part
      if(any(grepl(key, file))){
@@ -31,10 +30,6 @@ read_file <- function (file, key){
      }
 }
 
-
-log_table = do.call("rbind",lapply(files, read_file, key="LOG"))
-test_table= do.call("rbind",lapply(files, read_file, key="TEST"))
-
 better_log_table <-function(table){
      
      columns_position = c("PoziceHrace","PoziceAI", "CilArena1Pozice","CilArena2Pozice","CilAI1Pozice","CilAI2Pozice")
@@ -59,6 +54,4 @@ better_log_table <-function(table){
           table[,(column):=NULL]
      }
 }
-
-better_log_table(log_table)
 #atan2(as.numeric(tail(log_table[Faze==1],1)$cil3pozice.z),as.numeric(tail(log_table[Faze==1],1)$cil3pozice.x))

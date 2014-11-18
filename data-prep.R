@@ -125,4 +125,12 @@ newTable[,c('did.switch','whereTo'):=switching(.SD$JmenoCile),by=list(id,test.ph
 useTable = newTable[correct.ans!='INCORRECT',list(id,test.phase,Faze,JmenoOrientacnihoBodu,JmenoCile,correct.ans,reactionTime,did.switch,whereTo,cumsumAngAbs,same.letters.x,distance1,distance2)]
 useTable[,pokus:=(reactionTime)/cumsumAngAbs]
 #testing purposes
+
 #oldVec = newTable[test.phase=="F3",JmenoCile]
+helpTable=newTable[correct.ans=="CORRECT",list(correctAnsQuant=nrow(.SD)),by=list(id,test.phase)]
+setkey(helpTable,id,test.phase)
+newTable=merge(newTable,helpTable)
+
+helpTable=newTable[,list(AnsQuant=nrow(.SD)),by=list(id,test.phase,correct.ans)]
+setkey(helpTable,id,test.phase)
+newTable=merge(newTable,helpTable,by=c("id","test.phase","correct.ans"))

@@ -2,15 +2,22 @@ setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
 library(ggplot2)
 library(data.table)
 
-data.dir = "U:/Vyzkum/Diplomka/data/Unity/Ver1All/"
-
+data.dir = "U:/Vyzkum/Diplomka/data/Unity/Ver3All/"
+files = list.files(data.dir, full.names = T, recursive=T)
 source("Data-reader.R")
 
-#log_table[,max(Faze),by=(test.phase)]
+log_table = do.call("rbind",lapply(files, read_file, key="LOG"))
+test_table= do.call("rbind",lapply(files, read_file, key="TEST"))
 
+better_log_table(log_table)
 source("Data-prep.R")
 
-t=data.frame(newTable[same.letters.x==T,correct.ans,by=list(id,test.phase)])
+write.table(newTable,"newTableVer3.txt",sep=";",row.names=F,quote=F)
+
+#write.table(newTable,"newTable.txt",sep=";",row.names=F,quote=F)
+#n=fread("newTable.txt")
+
+t=data.frame(newTable[,correct.ans,by=list(id,test.phase)])
 uniq=nrow(unique(t["id"]))*3
 #checks the correct answers
 library(scales)
