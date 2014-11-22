@@ -1,0 +1,15 @@
+	maps ID	My ID	Version	time start	age	gender
+Mat	-	51	3	12:00	21	M
+Alb		52	3	13:00	15	M
+Ech		53	3	19:00	24	M
+Jos		74	3	15:30	24	M
+Ter		78	3	16:30	25	F
+Anna		83	3	20:00	21	F
+Tereza		89	3	15:00	21	F
+Martin		93	3	17:00	21	M
+Katka		101	3	18:30	21	F
+Hubáčková Ema	31	1	3	9:00	20	F
+Vargová Helena	32	3	3	9:00	22	F
+Bašová Tereza	33	4	3	10:20	19	F
+Šimon	34	6	3	10:20	20	M
+Noemi	35	7	3	11:40	21	F

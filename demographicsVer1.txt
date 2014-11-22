@@ -1,0 +1,51 @@
+	maps ID	My ID	Version	time start	age	gender
+Pavlína Netíková	1	1	1	9:00	20	F
+Beníèková Tereza	2	3	1	9:00	20	F
+Melicharová Julie	4	4	1	10:20	23	F
+Ondráková Alena	3	6	1	10:20	24	F
+Burdová Zuzana	6	7	1	11:40	19	F
+Králová Kateøina	5	9	1	11:40	24	F
+Bechynova Laura	8	11	1	13:00	21	F
+Mickova Hana	7	14	1	13:00	23	F
+Langrová Kristýna	9	15	1	14:20	20	F
+Šemberová Daria	10	17	1	14:20	25	F
+Fantová Simona	11	18	1	15:40	20	F
+Fuèíková Zuzana	12	19	1	15:40	23	F
+StøeÏanská mária	13	22	1	17:00	21	F
+Vrbová Tereza	14	23	1	17:00	20	F
+Veronika Hronova	15	28	1	18:20	23	F
+Korekova Maria	16	30	1	9:00	29	F
+Zameèník	17	31	1	9:00	23	M
+Knorková Alžbìta	18	32	1	10:20	21	F
+Tesaøová Monica	19	33	1	10:20	22	F
+Filatova Anastasia	20	35	1	11:40	21	F
+Rusnok Zuzana	21	38	1	11:40	25	F
+Razumòak Daniel	22	40	1	13:00	20	M
+Kmetová Žaneta	23	41	1	13:00	21	F
+KOèová Kateøina	24	43	1	14:20	20	F
+Støádalová Nela	25	44	1	14:20	21	F
+Štverka Adam	26	46	1	15:40	22	M
+Turòová Martina	27	47	1	15:40	20	F
+Neidermaierová TEreza	29	48	1	17:00	19	F
+Bendová Martina	30	49	1	17:00	23	F
+Anna	36	53	1	11:40	19	F
+Kotková Kateøina	37	51	1	13:00	23	F
+Táborská Tereza	38	52	1	13:00	19	F
+MIckova Tereza	39	74	1	14:20	22	F
+Novotna Dagmar	40	78	1	14:20	23	F
+Fikarová	41	83	1	15:40	23	F
+Kadlecová	42	89	1	15:40	22	F
+Karbanová	43	93	1	17:00	23	F
+Hurych Jan	44	116	1	9:00	23	M
+Mišùnová	45	101	1	9:00	21	F
+Hromková kristýna	46	123	1	10:20	22	F
+Vaculíková Nela	47	128	1	10:20	30	F
+Hegrlíková Marie	48	130	1	11:40	21	F
+Schillerová Nikola	49	133	1	11:40	22	F
+Doležalová Barbora	50	146	1	13:00	22	F
+Štrachová Zuzana	51	163	1	13:00	27	F
+Zahradníková TEreza	52	203	1	14:20	21	F
+Žihlová lenka	53	215	1	14:20	26	F
+fyalka Svitana	54	220	1	15:40	36	F
+Barvová Michaela	nestiha	231	1	17:00	20	F
+Goláòová Ivana	nestiha	232	1	17:00	22	F

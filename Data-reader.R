@@ -1,7 +1,7 @@
-read_file <- function (file, key){
+read_file <- function (file, key, dir){
      #searches for the log part
      if(any(grepl(key, file))){
-          name=gsub(data.dir,"",file)
+          name=gsub(dir,"",file)
           #removes the txt part
           name=substring(name,1,nchar(name)-4)
           
@@ -20,7 +20,7 @@ read_file <- function (file, key){
           colnames(basic_table)=c_names
           
           #path to the file
-          path = paste(c(data.dir,name),sep="",collapse="")
+          path = paste(c(dir,name),sep="",collapse="")
           
           prep_table=fread(file,sep=";")
           prep_table=cbind(prep_table,basic_table)
@@ -53,5 +53,16 @@ better_log_table <-function(table){
           }
           table[,(column):=NULL]
      }
+}
+add_demographics<-function(table,filename){
+     demograph<-fread(filename,colClasses=c("character","integer","integer","integer","time","integer","character"))
+     demograph[,c("V1","maps ID"):=NULL]
+     setnames(demograph,c("My ID","Version"),c("id","exp.version"))
+     demograph[gender=='M',gender:='male']
+     demograph[gender=='F',gender:='female']
+     demograph[,id:=as.character(id)]
+     setkey(demograph,id)
+     setkey(table,id)
+     return(merge(table,demograph))
 }
 #atan2(as.numeric(tail(log_table[Faze==1],1)$cil3pozice.z),as.numeric(tail(log_table[Faze==1],1)$cil3pozice.x))

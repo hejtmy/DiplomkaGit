@@ -21,7 +21,7 @@ sapply(colour_table,class)
 colour_table[,list(mean=mean(reactionTime,na.rm=T),sd=sd(reactionTime,na.rm=T)),by=list(colour,letter)]
 
 #fits the model
-fit<-aov(reactionTime~colour*letter,colour_table)
+fit<-aov(reactionTime~colour*letter+Error(id),colour_table)
 
 fit2<-aov(reactionTime~colour*letter*colour.prev*letter.prev,colour_table[colour.prev!=""])
 
