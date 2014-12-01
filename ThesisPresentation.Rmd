@@ -8,34 +8,24 @@ output: html_document
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 Let's do some data readings
-```{r}
+```{r,echo=F,message=F,warning=F,results='hide'}
 setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
 library(ggplot2)
 library(data.table)
 library(plyr)
+library(scales)
+library(ez)
+library(car)
+source("prep-for-print.R")
 ```
 
-We will look at the first version of the experiment first
-```{r,message=F,warning=F}
-newTable=fread("newTableVer3.txt",sep=";",header=T,autostart=1)
+\section{Demographics}
+
+```{r,echo=FALSE}
+
+dem.table
+
 ```
-
-I have already loaded and prepared all the necessary data. I will elaborate on this process later. No subjects are crossed out at this point. It takes about 2-5 minutes on a moderately strong PC (i5-4440, 8GB RAM)
-
-```{r,echo=F,results='hide',message=F,warning=F}
-newTable[,id:=as.character(id)]
-setkey(newTable,id,test.phase)
-```
-
-Demographics:
-
-
-We have several tables available for us to use:
-
-- log_table : contains all the data from the experiment
-- test_table : contains important data from the point where the subject gives his/her answer
-- newTable : useful aggregation of data from both the log table and test table. Contains information about switching, orientation points, angular distance traveled etc.
-- useTable: small concise table to use in ggplot. newTable has `r nrow(newTable)` rows with about `r ncol(newTable)` fifty columns, therefore `r nrow(newTable)*ncol(newTable)` cells in total. It's not generally a good idea to load the whole object into ggplot. Use table has only data which has been defined as either correct or inconclusive
 
 The tables include two distinct groups:
 
@@ -46,103 +36,192 @@ TRUE singnifies that same letters could occur after each other.
 
 Let's have a look at the percentages of correct answers.
 
-```{r, echo=FALSE}
-uniq=length(unique(newTable[,id]))
-uniq.diff=length(unique(newTable[same.letters.x==F,id]))
-uniq.same=length(unique(newTable[same.letters.x==T,id]))
-library(scales)
-setorder(newTable,correctAnsQuant)
-```
-
 Data for the F3 : continuous free turning
 
 ```{r, echo=F,message=F,fig.width=15, fig.height=8}
-t=data.frame(newTable[test.phase=='F3',list(correct.ans,id,same.letters.x,correctAnsQuant)])
-data<-unique(t[,c("id","correctAnsQuant")])
-t$id<-factor(t$id,levels=data[order(data$correctAnsQuant),"id"])
-corrplot=ggplot(t,aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq/sum(..count..)))
-corrplot+geom_bar(stat='bin')+facet_wrap(~same.letters.x,scales='free')+ scale_y_continuous(labels=percent)+ geom_hline(aes(yintercept = 0.85))
+corrplotF3
 ```
 
 Data for the F4 : free turning with orienting to a landmark
 
 ```{r, echo=F,,message=F,fig.width=15, fig.height=8}
-t=data.frame(newTable[test.phase=='F4',correct.ans,by=list(id,test.phase,same.letters.x,correctAnsQuant)])
-data<-unique(t[,c("id","correctAnsQuant")])
-t$id<-factor(t$id,levels=data[order(data$correctAnsQuant),"id"])
-corrplot=ggplot(t,aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq/sum(..count..)))
-corrplot+geom_bar(data=subset(t,same.letters.x==TRUE),aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq.same/sum(..count..)))+geom_bar(data=subset(t,same.letters.x==FALSE),aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq.diff/sum(..count..)))+facet_grid(~same.letters.x,scales='free')+scale_y_continuous(labels=percent)+geom_hline(aes(yintercept = 0.85))
+corrplotF4
 ```
 
 Data for the F5 : 2s delay before giving the goal.
 
 ```{r, echo=F,,message=F, fig.width=15, fig.height=8}
-t=data.frame(newTable[test.phase=='F5',correct.ans,by=list(id,test.phase,same.letters.x,correctAnsQuant)])
-data<-unique(t[,c("id","correctAnsQuant")])
-t$id<-factor(t$id,levels=data[order(data$correctAnsQuant),"id"])
-corrplot=ggplot(t,aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq/sum(..count..)))
-corrplot+geom_bar(data=subset(t,same.letters.x==TRUE),aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq.same/sum(..count..)))+geom_bar(data=subset(t,same.letters.x==FALSE),aes(x=id,fill=correct.ans,y = (..count..)*.GlobalEnv$uniq.diff/sum(..count..)))+facet_grid(~same.letters.x,scales='free')+scale_y_continuous(labels=percent)+geom_hline(aes(yintercept = 0.85))
+corrplotF5
 ```
 
-```{r,echo=F,results='hide'}
-newTable[,percentCorrect:=.SD$AnsQuant/nrow(.SD),by=list(id,test.phase)]
+# First Version of the experiment
+
+Analysis of the First Version of the experiment, therefore the goals fixed to sides.
+
+## Test phase F3
+Test phase F3. Free turning around. Only two conditions. Different goal-same reference frame, diferent-goal-different reference frame.
+
+### statistics
+```{r}
+resultsF3.1.T$stats
 ```
 
-We can see that quite a lot of subjects had problems with the task. Total of `r length(unique(newTable[correct.ans=="INCORRECT" & percentCorrect>0.15 & test.phase=="F3",id]))` subjects gave more than 15 percent of wrong answers in the F3, `r length(unique(newTable[correct.ans=="INCORRECT" & percentCorrect>0.15 & test.phase=="F4",id]))` in the F4 and `r length(unique(newTable[correct.ans=="INCORRECT" & percentCorrect>0.15 & test.phase=="F5",id]))` in F5. Out of those `r nrow(subset(count(unique(newTable[correct.ans=="INCORRECT" & percentCorrect>0.15 , list(id,test.phase)]),"id"),freq>=2))` gave more then 15 percent of wrong answers in two test phases and `r nrow(subset(count(unique(newTable[correct.ans=="INCORRECT" & percentCorrect>0.15 , list(id,test.phase)]),"id"),freq>=3))` in all three. 
-
-Nevertheless, here are some tables:
-```{r, echo=F}
-useTable = newTable[correct.ans!='INCORRECT',list(id,test.phase,Faze,JmenoOrientacnihoBodu,JmenoCile,correct.ans,reactionTime,did.switch,whereTo,cumsumAngAbs,same.letters.x,distance1,distance2)]
-#list of ids to discard from the analysis
-three.wrong=subset(count(unique(newTable[correct.ans=="INCORRECT" & percentCorrect>0.15 , list(id,test.phase)]),"id"),freq>=3)[,"id"]
-correct.ones=unique(newTable[correct.ans=="INCORRECT" & percentCorrect<0.15 , list(id,test.phase)])
-useTableCor=merge(useTable,correct.ones,by=c("id","test.phase"))
+### basic graph
+```{r,echo=F}
+resultsF3.1.T$plot.all
 ```
 
-General plot for all the correct answers from all the subjects:
-```{r, echo=F,fig.width=15, fig.height=12}
-bar = ggplot(useTable[did.switch != 'NA', list(mean=mean(reactionTime)),by=list(did.switch,test.phase,whereTo,same.letters.x)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_wrap(~whereTo, scales = "fixed")+facet_grid(same.letters.x~.,scales='free')
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF3.1.T$plot.gender
 ```
 
-General plot for all the correct answers from subject who had less then 15% errors in the phase::
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA', list(mean=mean(reactionTime)),by=list(did.switch,test.phase,whereTo,same.letters.x)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_wrap(~whereTo, scales = "fixed")+facet_grid(same.letters.x~.,scales='free')
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF3.1.T$plot.singular
 ```
 
-
-General plot for all the correct answers from subject who had less then 15% errors in the phase:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA', list(mean=mean(reactionTime)),by=list(did.switch,test.phase,whereTo,same.letters.x)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_wrap(~whereTo, scales = "fixed")+facet_grid(same.letters.x~.,scales='free')
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF3.1.T$model.all
+resultsF3.1.T$model.gender
 ```
 
-Similar data like in the last example, but only reaction times under 3s are evealuated
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & reactionTime<3, list(mean=mean(reactionTime)),by=list(did.switch,test.phase,whereTo,same.letters.x)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_wrap(~whereTo, scales = "fixed")+facet_grid(same.letters.x~.,scales='free')
+##Test phase F4 - two goals after each other NOT possible
+
+Test phase F4. Free turning around with forced orienting without pause. Only two conditions. Different goal-same reference frame and diferent goal-different reference frame.
+
+### statistics
+```{r}
+resultsF4.1.F$stats
 ```
 
-DAta split based on the landmark provided:
-Graphs for Same Letters == T:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==T,list(mean=mean(reactionTime)),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
+### basic graph
+```{r,echo=F}
+resultsF4.1.F$plot.all
 ```
 
-Graphs for Same Letters == F:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==F,list(mean=mean(reactionTime)),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF4.1.F$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF4.1.F$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF4.1.F$model.all
+resultsF4.1.F$model.gender
+```
+
+##Test phase F4 - same goals after each other possible
+
+Test phase F4. Free turning around with forced orienting without pause. All three ocnditions. Different goal-same reference frame, same goal-same reference frame and diferent goal-different reference frame.
+### statistics
+```{r}
+resultsF4.1.T$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF4.1.T$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF4.1.T$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF4.1.T$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF4.1.T$model.all
+resultsF4.1.T$model.gender
+```
+
+##Test phase F5 - same goals after one another NOT possible
+
+Test phase F5 Forced orienting with 2s pause. All three ocnditions. Different goal-same reference frame, same goal-same reference frame and diferent goal-different reference frame.
+
+```{r}
+resultsF5.1.F$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF5.1.F$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF5.1.F$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF5.1.F$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF5.1.F$model.all
+resultsF5.1.F$model.gender
+```
+
+##Test phase F5 - same goals possible
+
+Test phase F5 Forced orienting with 2s pause. All three ocnditions. Different goal-same reference frame, same goal-same reference frame and diferent goal-different reference frame.
+
+### statistics
+```{r}
+resultsF5.1.T$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF5.1.T$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF5.1.T$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF5.1.T$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF5.1.T$model.all
+resultsF5.1.T$model.gender
 ```
 
 Now the experimentation begins.
 
-```{r, echo=F}
-
-
-```
 There are several distances we can use for control:
 
 - distance1: this is an angular distance between a goal and player rotation at the time when the task is given. Distance1 has values between -180 to 180 degrees. Negative values are for distances 0-180 degrees to the left, positive 0-180 degrees to the right.
@@ -153,38 +232,3 @@ There are several distances we can use for control:
 
 WE can control the time subject needs to answer with the movement he needs to make. Simplest form is to presume linear movement of the subjects answer and then simply controll the reaction time by it:
 
-Graphs for Same Letters == F, controlled by distance1:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==F,list(mean=mean(reactionTime/abs(distance1))),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-```
-
-Graphs for Same Letters == F, controlled by distance2:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==F,list(mean=mean(reactionTime/abs(distance2))),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-```
-
-Graphs for Same Letters == T, controlled by distance1:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==T,list(mean=mean(reactionTime/abs(distance1))),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-```
-
-Graphs for Same Letters == T, controlled by distance2:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==T,list(mean=mean(reactionTime/abs(distance2))),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-```
-
-Graphs for Same Letters == F, controlled by cumsumAngAbs:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==F,list(mean=mean(reactionTime/cumsumAngAbs)),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-```
-
-Graphs for Same Letters == T,  controlled by cumsumAngAbs:
-```{r, echo=F, fig.width=15, fig.height=12}
-bar = ggplot(useTableCor[did.switch != 'NA' & same.letters.x==T,list(mean=mean(reactionTime/cumsumAngAbs)),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
-bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-```

@@ -126,7 +126,8 @@ addLogTail<-function(log_table,test_table){
      setkey(test_table,id,test.phase,Faze)
      return(merge(test_table,smallTable,all.x=T))
 }
-                                         
+summary(newTable[test.phase=="F4" & exp.version==1,abs(distance1)])
+
 addDistances<-function(log_table,test_table){
     
      #creates small table from the log table with only the first log line 

@@ -34,8 +34,15 @@ loadVer3<-function(){
      source("Data-prep.R")
      return(newTable)
 }
-newTable<-loadVer3()
-#write.table(newTable,"newTableVer3.txt",sep=";",row.names=F,quote=F)
+
+#newTable[,exp.version:=2]
+write.table(newTable,"newTableVerAll3.0.txt",sep=";",row.names=F,quote=F)
+###Oprava chyby
+
+newTable[newid=="116.1" & letter=="A",meanLetterRT:=0.2972653]
+newTable[newid=="116.1" & letter=="B",meanLetterRT:=0.2749958]
+newTable[newid=="116.1" & letter=="C",meanLetterRT:=0.3363560]
+newTable[newid=="116.1" & letter=="D",meanLetterRT:=0.2881440]
 
 makeMyTable<-function(table,custom.list){
      table[,mean:=mean(reactionTime),by=custom.list]
@@ -50,7 +57,7 @@ makeMyTable<-function(table,custom.list){
 newTable=fread("newTableVer1.txt",sep=";",header=T,autostart=1)
 
 fit.table=makeMyTable(newTable[did.switch !="NA" & test.phase=='F5' & changedGoal!="NA"],c("id","kamilFaktor"))
-fit.table=newTable[did.switch !="NA" & test.phase=='F5' & changedGoal!="NA" & same.letters==T]
+fit.table=newTable[did.switch !="NA" & test.phase=='F5' & changedGoal!="NA" & same.letters=="full.allternation" & JmenoOrientacnihoBodu=="Mezi-cily"]
 bar=ggplot(fit.table,aes(x=kamilFaktor,y=mean,fill=changedGoal))
 bar+geom_bar(stat='identity',position='dodge') + geom_errorbar(aes(ymax=mean.sem.upper, ymin=mean.sem.lower),position=position_dodge(0.9))
 
@@ -117,13 +124,23 @@ model2=ezANOVA(
      type=3
 )
 
+model.gender=ezANOVA(
+     data=useTableCor,
+     dv=reactionTime,
+     wid=newid,
+     within=kamilFaktor,
+     within_full=kamilFaktor,
+     within_covariates=distance1,
+     between=gender,
+     detailed=T,
+)
 
-
+model
 
 hist=ggplot(newTable[did.switch !="NA" & test.phase=='F3'],aes(x=distance1))
 hist+geom_histogram(binwidth=5)
 
-scatter=ggplot(newTable[did.switch !="NA" & reactionTime<3],aes(x=distance1,y=reactionTime))
+scatter=ggplot(useTable[did.switch !="NA" & reactionTime<3],aes(x=distance1,y=reactionTime))
 scatter+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)
 
 summary(lm(reactionTime~distance1,newTable[did.switch !="NA" & distance1>=0]))
@@ -159,7 +176,6 @@ bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrienta
 
 bar = ggplot(useTable[did.switch != 'NA' & test.phase != 'F3' & same.letters.x==F, list(mean=mean(pokus)),by=list(did.switch,test.phase,whereTo,JmenoOrientacnihoBodu)],aes(x=test.phase,y=mean,fill=c(did.switch)))
 bar+geom_bar(stat='identity',position='dodge') + facet_grid(whereTo~JmenoOrientacnihoBodu, scales = "fixed")
-
 
 useTable[did.switch != 'NA' ,list(sd=sd(reactionTime),mean=mean(pokus), mean2=mean(reactionTime)),by=list(did.switch,test.phase,whereTo)]
 
