@@ -39,10 +39,10 @@ loadVer3<-function(){
 write.table(newTable,"newTableVerAll3.0.txt",sep=";",row.names=F,quote=F)
 ###Oprava chyby
 
-newTable[newid=="116.1" & letter=="A",meanLetterRT:=0.2972653]
-newTable[newid=="116.1" & letter=="B",meanLetterRT:=0.2749958]
-newTable[newid=="116.1" & letter=="C",meanLetterRT:=0.3363560]
-newTable[newid=="116.1" & letter=="D",meanLetterRT:=0.2881440]
+# newTable[newid=="116.1" & letter=="A",meanLetterRT:=0.2972653]
+# newTable[newid=="116.1" & letter=="B",meanLetterRT:=0.2749958]
+# newTable[newid=="116.1" & letter=="C",meanLetterRT:=0.3363560]
+# newTable[newid=="116.1" & letter=="D",meanLetterRT:=0.2881440]
 
 makeMyTable<-function(table,custom.list){
      table[,mean:=mean(reactionTime),by=custom.list]

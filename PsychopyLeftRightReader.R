@@ -1,35 +1,39 @@
 library(data.table)
-library(ggplot2)
-setwd("U:/Vyzkum/Diplomka/Data/Psychopy/LeftRight/Ver3/")
+library(binhf)
 
-data.dir = "U:/Vyzkum/Diplomka/Data/Psychopy/LeftRight/Ver3/"
-
-data.dir = "C:/Lukas/Vyzkum/Diplomka/DiplomkaGit/dataPsy/"
-
-files = list.files(data.dir, full.names = T)
 read_file <- function (file){
      if(any(grepl(".csv", file))){
-          mytable = read.csv(file)
-          #deletes rows from the instruction part
-          prep_table = as.data.table(mytable[nchar(as.character(mytable$answer_image))==0,c(2:4,21:29)])
-          return (prep_table)
+          table = fread(file)
+          return (table)
      }    
 }
 
-leftright_table= do.call("rbind",lapply(files, read_file))
-
-setnames(leftright_table,c("key_resp_2.keys","key_resp_2.corr","key_resp_2.rt","participant"),c("klavesa","spravnaOdpoved","reactionTime","id"))
-
-
-table(leftright_table[,spravnaOdpoved,by=id])
-
-checkCorr <- function (key1,key2){
+#function to prepare the table
+letter_prep_table <-function(dir,num){
      
-     if(as.character(key1)==as.character(key2)){
-          return(1)
-     } else {
-          return (0)
-     }
+     files = list.files(dir, full.names = T)
+     
+     leftright_table = do.call("rbind",lapply(files, read_file))
+     leftright_table = leftright_table[answer_image=="" & image!=""]
+     #renames to more comprehensiv
+     leftright_table=leftright_table[,c(2:4,21:28),with = FALSE]
+     
+     setnames(leftright_table,c("key_resp_2.keys","key_resp_2.rt","key_resp_2.corr","participant"),c("key","reactionTime","correct","id"))
+     
+     setkey(leftright_table,id)
+     leftright_table[,angle.prev:=c("",angle[1:.N-1]),by=id]
+     
+     leftright_table=leftright_table[angle.prev=="",angle.prev:=NA]
+
+     leftright_table[,exp.version:=num]
+     leftright_table=cbind(leftright_table,newid=paste(leftright_table$id,".",leftright_table$exp.version,sep="",collpase=""))
+     return(leftright_table)
 }
 
-leftright_table[,key_resp_2.corr:=lapply(c(answer,key_resp_2.keys),checkCorr)]
+letter_remove_long_reactions <-function(table,max.time){
+     pre=nrow(table)
+     returnTable=table[reactionTime<max.time]
+     post=nrow(returnTable)
+     print(paste(c(as.character(pre-post),"zaznamù smazáno"),sep=" ",collapse=" "))
+     return(returnTable)
+}
