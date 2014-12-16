@@ -11,56 +11,7 @@ library(reshape)
 library(psych)
 library(xtable)
 
-apaP<-function(value){
-     if(is.na(value)){
-          return(NA)
-     }
-     if (value < 0.001){
-          return("p \\textless .001 ")
-     }
-     if (value < 0.01){
-          return("p \\textless .01 ")
-     }
-     if (value < 0.03){
-          return("p \\textless .03 ")
-     }
-     if (value < 0.05){
-          return("p \\textless .05 ")
-     }
-     if (value < 0.1){
-          return(paste("p = ",gsub("^(-?)0.", "\\1.", round(value,digits=3)),sep=""))
-     }
-     if (value >0.1){
-          return(paste("p = ",gsub("^(-?)0.", "\\1.", format(value,digits=3)),sep=""))
-     }
-}
-apaCor<-function(value){
-     return(gsub("^(-?)0.", "\\1.", format(value,digits=3)))
-}
-apaPtable<-function(value){
-     if(is.na(value)){
-          return(NA)
-     }
-     if (value < 0.001){
-          return("\\textless .001 ")
-     }
-     if (value < 0.01){
-          return("\\textless .01 ")
-     }
-     if (value < 0.03){
-          return("\\textless .03 ")
-     }
-     if (value < 0.05){
-          return("\\textless .05 ")
-     }
-     if (value < 0.1){
-          return(paste(gsub("^(-?)0.", "\\1.", round(value,digits=3)),sep=""))
-     }
-     if (value >0.1){
-          return(paste(gsub("^(-?)0.", "\\1.", format(value,digits=3)),sep=""))
-     }
-     
-}
+source("output-helpers.R")
 
 # newTable1=fread("newTableVer1.txt",sep=";",header=T,autostart=1)
 # newTable2=fread("newTableVer2.txt",sep=";",header=T,autostart=1)
@@ -72,13 +23,16 @@ newTable=fread("newTableVerAll3.0.txt",sep=";",header=T,autostart=1)
 #remove one group - too small
 newTable=newTable[!(same.letters==F & exp.version==2)]
 newTable[,newid:=factor(newid)]
-newTable
 newTable[,same.letters:=factor(same.letters,levels=c(T,F),labels=c("full.alternation","partial.alternation"))]
-newTable[,ExpFaktor:=factor(kamilFaktor,levels=c("same.goal","dif.goal","dif.reference","NA"))]
+newTable[,ExpFaktor:=factor(kamilFaktor,levels=c("same.goal","dif.goal","dif.reference","NA"),labels=c("same.goal","different.goal","different.reference.frame","NA"))]
 newTable[,kamilFaktor:=NULL]
 newTable[,exp.version:=factor(exp.version)]
 setkey(newTable,newid,exp.version,test.phase,Faze)
 newTable[,rtCorrected:=reactionTime-meanLetterRT]
+
+#setting ggplot
+theme_set(theme_bw(base_size = 25))
+update_geom_defaults("line",   list(size= 1))
 
 #nice demographic table
 dem.table=tabular((Experiment=factor(exp.version)+1)*(Sequence=factor(same.letters)+1)~(Gender=factor(gender))*((n=1)+age*(mean+sd+min+max)),unique(newTable[,.(age,exp.version,same.letters,gender,newid)]))
@@ -87,47 +41,23 @@ dem.table1=tabular((Experiment=factor(exp.version))*(Sequence=factor(same.letter
 #nice demographic table
 dem.table2=tabular((Experiment=factor(exp.version))*(Sequence=factor(same.letters)+1)~(Gender=factor(gender))*((n=1)+age*(mean+sd+min+max)),unique(newTable[exp.version==2,.(age,exp.version,same.letters,gender,newid)]))
 
-t=unique(data.frame(newTable[test.phase=='F3',list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,newid)]))
-index<-with(t,order(exp.version,same.letters,correctAnsQuant,id,correct.ans))
-t=t[index,]
-t$newid<-reorder(t$newid,t$correctAnsQuant)
-corrplotF3=ggplot(t,aes(x=newid,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(same.letters,exp.version),scales='free')+ geom_hline(aes(yintercept = 0.75))
-
 t=unique(data.frame(newTable[same.letters=="partial.alternation" & exp.version==1,list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,test.phase)]))
 index<-with(t,order(test.phase,correctAnsQuant,id,correct.ans))
 t=t[index,]
 t$id<-reorder(t$id,t$correctAnsQuant)
-corrplot.1.partial=ggplot(t,aes(x=id,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75))
-
-t=unique(data.frame(newTable[same.letters=="partial.alternation" & exp.version==2,list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,test.phase)]))
-index<-with(t,order(test.phase,correctAnsQuant,id,correct.ans))
-t=t[index,]
-t$id<-reorder(t$id,t$correctAnsQuant)
-corrplot.2.partial=ggplot(t,aes(x=id,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75))
+corrplot.1.partial=ggplot(t,aes(x=id,fill=interaction(correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75)) + ylab("Ratio of answers")+xlab("Individual performances")+theme(axis.ticks = element_blank(), text = element_text(size=15), axis.text.x = element_blank(),legend.position="bottom") + guides(fill=guide_legend(title="Answer type"))
 
 t=unique(data.frame(newTable[same.letters=="full.alternation" & exp.version==1,list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,test.phase)]))
 index<-with(t,order(test.phase,correctAnsQuant,id,correct.ans))
 t=t[index,]
 t$id<-reorder(t$id,t$correctAnsQuant)
-corrplot.1.full=ggplot(t,aes(x=id,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75))
+corrplot.1.full=ggplot(t,aes(x=id,fill=interaction(correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75))+ ylab("Ratio of answers")+xlab("Individual performances")+theme(axis.ticks = element_blank(), text = element_text(size=15), axis.text.x = element_blank(),legend.position="bottom") + guides(fill=guide_legend(title="Answer type"))
 
 t=unique(data.frame(newTable[same.letters=="full.alternation" & exp.version==2,list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,test.phase)]))
 index<-with(t,order(test.phase,correctAnsQuant,id,correct.ans))
 t=t[index,]
 t$id<-reorder(t$id,t$correctAnsQuant)
-corrplot.2.full=ggplot(t,aes(x=id,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75))
-
-t=unique(data.frame(newTable[test.phase=='F4',list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,newid)]))
-index<-with(t,order(exp.version,same.letters,correctAnsQuant,id,correct.ans))
-t=t[index,]
-t$newid<-reorder(t$newid,t$correctAnsQuant)
-corrplotF4=ggplot(t,aes(x=newid,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(same.letters,exp.version),scales='free')+ geom_hline(aes(yintercept = 0.75))
-
-t=unique(data.frame(newTable[test.phase=='F5',list(gender,correct.ans,id,same.letters,correctAnsQuant,AnsQuant,exp.version,newid)]))
-index<-with(t,order(exp.version,same.letters,correctAnsQuant,id,correct.ans))
-t=t[index,]
-t$newid<-reorder(t$newid,t$correctAnsQuant)
-corrplotF5=ggplot(t,aes(x=newid,fill=interaction(gender,correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(same.letters,exp.version),scales='free')+ geom_hline(aes(yintercept = 0.75))
+corrplot.2.full=ggplot(t,aes(x=id,fill=interaction(correct.ans),y = AnsQuant))+geom_bar(stat='identity',position='fill')+facet_wrap(.(test.phase),scales='free')+ geom_hline(aes(yintercept = 0.75))+ ylab("Ratio of answers")+xlab("Individual performances")+theme(axis.ticks = element_blank(),text = element_text(size=15), axis.text.x = element_blank(),legend.position="bottom") + guides(fill=guide_legend(title="Answer type"))
 
 setorder(newTable,newid,test.phase,Faze)
 newTable[,percentAns:=.SD$AnsQuant/nrow(.SD),by=list(newid,test.phase)]
@@ -136,30 +66,52 @@ useTable = newTable[correct.ans=='CORRECT' & changedGoal!="NA" & reactionTime<5]
 smallFrame=unique(newTable[,list(newid,test.phase)])
 #nrow(unique(newTable[(correct.ans=='INCORRECT' & percentAns>0.1), list(newid,test.phase)]))
 #list of ids to discard from the analysis
-wrong.ones=unique(newTable[correct.ans=='INCORRECT' & percentAns>0.1, list(newid,test.phase)])
-smallFrame=rbind(smallFrame,wrong.ones)
-correct.ones=smallFrame[!(duplicated(smallFrame) | duplicated(smallFrame, fromLast = TRUE)), ]
+#wrong.ones=unique(newTable[correct.ans=='INCORRECT' & percentAns>0.1, list(newid,test.phase)])
+#smallFrame=rbind(smallFrame,wrong.ones)
+#correct.ones=smallFrame[!(duplicated(smallFrame) | duplicated(smallFrame, fromLast = TRUE)), ]
 correct.ones=unique(newTable[correct.ans=='CORRECT' & percentAns>0.75, list(newid,test.phase)])
 nrow(unique(newTable[correct.ans=='CORRECT' & percentAns<0.75, list(newid,test.phase)]))
 useTableCor=merge(useTable,correct.ones,by=c("newid","test.phase"))
 
 doAnovaThings<-function(subset){
      stats=ezStats(
-          data=subset,
-          dv=reactionTime,
+          data=subset[rtCorrected>0],
+          dv=rtCorrected,
           wid=newid,
           within=ExpFaktor,
           within_full=ExpFaktor,
           between=gender,
      )
+     
+     statsGender=ezStats(
+          data=subset[rtCorrected>0],
+          dv=rtCorrected,
+          wid=newid,
+          within=ExpFaktor,
+          within_full=ExpFaktor,
+          between=gender,
+     )
+     
+     statsAll=ezStats(
+          data=subset[rtCorrected>0],
+          dv=rtCorrected,
+          wid=newid,
+          within=ExpFaktor,
+          within_full=ExpFaktor,
+     )
+     
      if(subset$same.letters[1]=='full.alternation' & subset$test.phase != 'F3'){
           typeNum=12
      } else {
           typeNum=9
      }
-     descr.table=tabular(((Gender=factor(gender))+Hline(2:typeNum)+1)~Format(digits=3)*Heading()*reactionTime*(Condition=factor(ExpFaktor))*(mean+sd+min+max),subset)
+     descr.table=tabular(((Gender=factor(gender))+Hline(2:typeNum)+1)~Format(digits=3)*Heading()*rtCorrected*(Condition=factor(ExpFaktor))*(mean+sd+min+max),subset[rtCorrected>0])
      
-     plot.gender=ezPlot(
+     plot.all=ggplot(statsAll,aes(x=ExpFaktor,y=Mean,split=ExpFaktor))+geom_bar(stat="identity",fill="grey",colour="black")+geom_errorbar(aes(ymax=Mean+FLSD/2,ymin=Mean-FLSD/2),width=0.3,size=1) +labs(y="Mean reaction time (s)",x="Condition") +  scale_y_continuous(limits=c(0,3))
+     
+     plot.gender=ggplot(statsGender,aes(x=gender,y=Mean,split=ExpFaktor,fill=factor(ExpFaktor)))+geom_bar(stat="identity",position="dodge",colour="black")+geom_errorbar(aes(ymax=Mean+FLSD/2,ymin=Mean-FLSD/2),position=position_dodge(width=0.9),width=0.3) +labs(y="Mean reaction time (s)",x="Gender")+  scale_y_continuous(limits=c(0,3))+theme(legend.position="bottom") + guides(fill=guide_legend(title="Condition"))
+     
+     plot.gender2=ezPlot(
           data=subset,
           dv=reactionTime,
           wid=newid,
@@ -169,9 +121,12 @@ doAnovaThings<-function(subset){
           split=gender,
           x=ExpFaktor,
           bar_width=0.1,
+          y_lab="Mean(RT)",
+          x_lab="Condition",
+          split_lab="Gender"
      )
      
-     plot.all=ezPlot(
+     plot.all2=ezPlot(
           data=subset,
           dv=reactionTime,
           wid=newid,
@@ -179,6 +134,8 @@ doAnovaThings<-function(subset){
           within_full=ExpFaktor,
           x=ExpFaktor,
           bar_width=0.1,
+          y_lab="Mean(RT)",
+          x_lab="Condition",
      )
      
     
@@ -208,6 +165,8 @@ doAnovaThings<-function(subset){
           within_full=ExpFaktor,
           x=ExpFaktor,
           bar_width=0.1,
+          y_lab="Mean(Corrected RT)",
+          x_lab="Condition",
      )
      
      model.all.rtCorr=ezANOVA(
@@ -221,7 +180,8 @@ doAnovaThings<-function(subset){
      )
      
      #creates a nice post.hoc table
-     ttesttable<-subset[,.(reactionTime=mean(reactionTime,na.rm=T)),by=.(newid,ExpFaktor)]
+     #ttesttable<-subset[,.(reactionTime=mean(reactionTime,na.rm=T)),by=.(newid,ExpFaktor)]
+     ttesttable<-subset[rtCorrected>0,.(reactionTime=mean(rtCorrected,na.rm=T)),by=.(newid,ExpFaktor)]
      postHoc<-pairwise.t.test(ttesttable$reactionTime,ttesttable$ExpFaktor,pool.sd=F,paired=T,p.adjust.method="bonferroni")
      postHocTable<-apply(postHoc$p.value,1:2,apaPtable)
 
@@ -240,8 +200,19 @@ doAnovaAcross<-function(subset){
      
      descr.table=tabular(((Version=factor(exp.version))+Hline(2:typeNum))~Format(digits=3)*Heading()*reactionTime*(Condition=factor(ExpFaktor))*(mean+sd+min+max),subset)
      
+     statsAll=ezStats(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=ExpFaktor,
+          within_full=ExpFaktor,
+          between=exp.version,
+          between_full=exp.version
+     )
+
+     plot.all=ggplot(statsAll,aes(x=exp.version,y=Mean,split=ExpFaktor,fill=factor(ExpFaktor)))+geom_bar(stat="identity",position="dodge",colour="black")+geom_errorbar(aes(ymax=Mean+FLSD/2,ymin=Mean-FLSD/2),position=position_dodge(width=0.9),width=0.3) + labs(y="Mean reaction time (s)",x="Experiment version") +  scale_y_continuous(limits=c(0,3))+theme(legend.position="bottom") + guides(fill=guide_legend(title="Condition"))
      
-     plot.all=ezPlot(
+     plot.all2=ezPlot(
           data=subset,
           dv=reactionTime,
           wid=newid,
@@ -251,6 +222,9 @@ doAnovaAcross<-function(subset){
           split=exp.version,
           x=ExpFaktor,
           bar_width=0.1,
+          y_lab="Mean(RT)",
+          x_lab="Condition",
+          split_lab="Experiment"
      )
      
      model.all=ezANOVA(
@@ -264,7 +238,18 @@ doAnovaAcross<-function(subset){
           detailed=T,
           type=3
      )    
-     return.list=list("plot.all"=plot.all,"model.all"=model.all,"descr.table"=descr.table,"subset"=subset)
+     model.all.rtCorr=ezANOVA(
+          data=subset[rtCorrected>0],
+          dv=rtCorrected,
+          wid=newid,
+          within=ExpFaktor,
+          within_full=ExpFaktor,
+          between=exp.version,
+          return_aov=T,
+          detailed=T,
+          type=3
+     )
+     return.list=list("plot.all"=plot.all,"model.all"=model.all,"descr.table"=descr.table,"subset"=subset,"model.all.rtCorr"=model.all.rtCorr)
      return(return.list)
 }
 
@@ -326,62 +311,34 @@ return.list=list("stats"=stats,"plot.all"=plot.all,"plot.gender"=plot.gender,"mo
 return(return.list)
 }
 
+
+###
+#FIRST EXPERIMENT
+#PARTIAL ALTERNATION
+###
+
 subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="partial.alternation",]
 resultsF3.1.F<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="full.alternation",]
-resultsF3.1.T<-list(doAnovaThings(subset))[[1]]
-
 subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="partial.alternation",]
 resultsF4.1.F<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation",]
-resultsF4.1.T<-list(doAnovaThings(subset))[[1]]
-
 subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="partial.alternation",]
 resultsF5.1.F<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation",]
-resultsF5.1.T<-list(doAnovaThings(subset))[[1]]
 
+###
+#FIRST EXPERIMENT
+#PARTIAL ALTERNATION
+#ONLY MIDDLE
+###
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="partial.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")),]
+MIDresultsF4.1.F<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="partial.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")),]
+MIDresultsF5.1.F<-list(doAnovaThings(subset))[[1]]
 
-subset=useTableCor[test.phase=='F3' & exp.version==2 & same.letters=="full.alternation",]
-resultsF3.3.T<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F4' & exp.version==2 & same.letters=="full.alternation",]
-resultsF4.3.T<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="full.alternation",]
-resultsF5.3.T<-list(doAnovaThings(subset))[[1]]
-
-# subset=useTableCor[test.phase=='F4' & exp.version==2 & same.letters=="partial.alternation",]
-# resultsF4.3.F<-list(doAnovaThings(subset))[[1]]
-# subset=useTableCor[test.phase=='F3' & exp.version==2 & same.letters=="partial.alternation",]
-# resultsF3.3.F<-list(doAnovaThings(subset))[[1]]
-# subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="partial.alternation",]
-# resultsF5.3.F<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo"))& whereTo=='Arena',]
-resultsF4.1.T.A.M<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo"))& whereTo=='Arena',]
-resultsF5.1.T.A.M<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="partial.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo"))& whereTo=='Arena',]
-resultsF4.1.F.A.M<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="partial.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo"))& whereTo=='Arena',]
-resultsF5.1.F.A.M<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="full.alternation" & whereTo=='Arena',]
-resultsF3.1.T.A<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="full.alternation" & whereTo=='AI',]
-resultsF3.1.T.F<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & whereTo=='Arena',]
-resultsF4.1.T.A<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & whereTo=='AI',]
-resultsF4.1.T.F<-list(doAnovaThings(subset))[[1]]
-
-subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & whereTo=='Arena',]
-resultsF5.1.T.A<-list(doAnovaThings(subset))[[1]]
-subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & whereTo=='AI',]
-resultsF5.1.T.F<-list(doAnovaThings(subset))[[1]]
+###
+#FIRST EXPERIMENT
+#PARTIAL ALTERNATION
+#DIFFERENTIATING ARENA AND AI
+###
 
 subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="partial.alternation" & whereTo=='Arena',]
 resultsF3.1.F.A<-list(doAnovaThings(subset))[[1]]
@@ -398,6 +355,99 @@ resultsF5.1.F.A<-list(doAnovaThings(subset))[[1]]
 subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="partial.alternation" & whereTo=='AI',]
 resultsF5.1.F.F<-list(doAnovaThings(subset))[[1]]
 
+###
+#FIRST EXPERIMENT
+#PARIAL ALTERNATION
+#DIFFERENTIATING ARENA AND AI
+#ONLY MIDDLE
+###
+
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="partial.alternation" & JmenoOrientacnihoBodu == "Mezi-cily" & whereTo=='Arena',]
+MIDresultsF4.1.F.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="partial.alternation" & JmenoOrientacnihoBodu == "Mezi-cily" & whereTo=='Arena',]
+MIDresultsF5.1.F.A<-list(doAnovaThings(subset))[[1]]
+
+###
+#FIRST EXPERIMENT
+#FULL ALTERNATION
+###
+
+subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="full.alternation",]
+resultsF3.1.T<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation",]
+resultsF4.1.T<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation",]
+resultsF5.1.T<-list(doAnovaThings(subset))[[1]]
+
+###
+#FIRST EXPERIMENT
+#FULL ALTERNATION
+#ONLY MIDDLE
+###
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")),]
+MIDresultsF4.1.T<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")),]
+MIDresultsF5.1.T<-list(doAnovaThings(subset))[[1]]
+###
+#FIRST EXPERIMENT
+#FULL ALTERNATION
+#DIFFERENTIATING ARENA AND AI
+###
+
+subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="full.alternation" & whereTo=='Arena',]
+resultsF3.1.T.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F3' & exp.version==1 & same.letters=="full.alternation" & whereTo=='AI',]
+resultsF3.1.T.F<-list(doAnovaThings(subset))[[1]]
+
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & whereTo=='Arena',]
+resultsF4.1.T.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & whereTo=='AI',]
+resultsF4.1.T.F<-list(doAnovaThings(subset))[[1]]
+
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & whereTo=='Arena',]
+resultsF5.1.T.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & whereTo=='AI',]
+resultsF5.1.T.F<-list(doAnovaThings(subset))[[1]]
+
+###
+#FIRST EXPERIMENT
+#FULL ALTERNATION
+#DIFFERENTIATING ARENA AND AI
+#ONLY MIDDLE - the figure is effectively the same
+###
+
+subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="full.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")) & whereTo=='Arena',]
+MIDresultsF4.1.T.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==1 & same.letters=="full.alternation" & JmenoOrientacnihoBodu == "Mezi-cily" & whereTo=='Arena',]
+MIDresultsF5.1.T.A<-list(doAnovaThings(subset))[[1]]
+
+
+###
+#SECOND EXPERIMENT
+###
+
+subset=useTableCor[test.phase=='F3' & exp.version==2 & same.letters=="full.alternation",]
+resultsF3.3.T<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F4' & exp.version==2 & same.letters=="full.alternation",]
+resultsF4.3.T<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="full.alternation",]
+resultsF5.3.T<-list(doAnovaThings(subset))[[1]]
+
+###
+#SECOND EXPERIMENT
+#MIDDLE
+###
+
+subset=useTableCor[test.phase=='F4' & exp.version==2 & same.letters=="full.alternation" & JmenoOrientacnihoBodu %in% c("Mezi-cily","AI Character"),]
+MIDresultsF4.3.T<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="full.alternation" & JmenoOrientacnihoBodu %in% c("Mezi-cily","AI Character"),]
+MIDresultsF5.3.T<-list(doAnovaThings(subset))[[1]]
+
+###
+#SECOND EXPERIMENT
+#DIFFERENTIATING ARENA AND AI
+###
+
 subset=useTableCor[test.phase=='F3' & exp.version==2 & same.letters=="full.alternation" & whereTo=='Arena',]
 resultsF3.3.T.A<-list(doAnovaThings(subset))[[1]]
 subset=useTableCor[test.phase=='F3' & exp.version==2 & same.letters=="full.alternation" & whereTo=='AI',]
@@ -413,6 +463,25 @@ resultsF5.3.T.A<-list(doAnovaThings(subset))[[1]]
 subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="full.alternation" & whereTo=='AI',]
 resultsF5.3.T.F<-list(doAnovaThings(subset))[[1]]
 
+###
+#SECOND EXPERIMENT
+#DIFFERENTIATING ARENA AND AI
+#ONLY MIDDLE
+###
+
+subset=useTableCor[test.phase=='F4' & exp.version==2 & same.letters=="full.alternation" & whereTo=='Arena' & JmenoOrientacnihoBodu=="Mezi-cily",]
+MIDresultsF4.3.T.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F4' & exp.version==2 & same.letters=="full.alternation" & whereTo=='AI' & JmenoOrientacnihoBodu=="AI Character",]
+MIDresultsF4.3.T.F<-list(doAnovaThings(subset))[[1]]
+
+subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="full.alternation" & whereTo=='Arena' & JmenoOrientacnihoBodu=="Mezi-cily",]
+MIDresultsF5.3.T.A<-list(doAnovaThings(subset))[[1]]
+subset=useTableCor[test.phase=='F5' & exp.version==2 & same.letters=="full.alternation" & whereTo=='AI' & JmenoOrientacnihoBodu=="AI Character",]
+MIDresultsF5.3.T.F<-list(doAnovaThings(subset))[[1]]
+
+###
+#BETWEEN GROUP RESULTS
+###
 subset=useTableCor[test.phase=='F3' & same.letters=="full.alternation" & whereTo=='Arena',]
 resultsF3.B.A<-doAnovaAcross(subset)
 subset=useTableCor[test.phase=='F3' & same.letters=="full.alternation" & whereTo=='AI',]
@@ -428,43 +497,17 @@ resultsF5.B.A<-doAnovaAcross(subset)
 subset=useTableCor[test.phase=='F5' & same.letters=="full.alternation" & whereTo=='AI',]
 resultsF5.B.F<-doAnovaAcross(subset)
 
-reportAnova<-function(myList){
-     mauch=myList$model.all$"Mauchly's Test for Sphericity"
-     spher=myList$model.all$`Sphericity Corrections`
-     
-     if(is.null(mauch)){
-          fstat=paste("F(",myList$model.all$ANOVA$DFn[2],", ",myList$model.all$ANOVA$DFd[2],")= ",round(myList$model.all$ANOVA$F[2],digits=2), ", ",apaP(myList$model.all$ANOVA$p[2]),sep="")
-          return(fstat)
-     }
-     
-     if(mauch$p>0.05){
-          fstat=paste("F(",myList$model.all$ANOVA$DFn[2],", ",myList$model.all$ANOVA$DFd[2],")= ",round(myList$model.all$ANOVA$F[2],digits=2), ", ",apaP(myList$model.all$ANOVA$p[2]),sep="")
-          return(fstat)
-     }    
-     
-     if(mauch$p<0.05){
-          if(spher$GGe>0.75){
-               #using Hugh-Feldt correction
-              mauchly=paste("(Mauchly's test indicated that assumption of sphericity was violated, " ,apaP(mauch$p),"; Greenhouse-Geisser ($\\epsilon$ = ", round(spher$GGe,digits=2),"), degrees of freedon were corrected using Huynh-Feldt estimates of sphericity)",sep="")
-              fstat=paste("F(",round(spher$HFe*myList$model.all$ANOVA$DFn[2],digits=2),", ",round(spher$HFe*myList$model.all$ANOVA$DFd[2],digits=2),") = ",round(myList$model.all$ANOVA$F[2],digits=2), ", ",apaP(spher$"p[HF]"),sep="")
-              return(paste(fstat, mauchly,sep=" "))
-          }
-          if(spher$GGe<0.75){
-               #using Hugh-Feldt correction
-               mauchly=paste("(Mauchly's test indicated that assumption of sphericity was violated, " ,apaP(mauch$p),"; degrees of freedom were corrected using Greenhouse-Geisser ($\\epsilon$ = ", round(spher$GGe,digits=2),") estimates of sphericity)",sep="")
-               fstat=paste("F(",round(spher$GGe*myList$model.all$ANOVA$DFn[2],digits=2),", ",round(spher$GGe*myList$model.all$ANOVA$DFd[2],digits=2),") = ",round(myList$model.all$ANOVA$F[2],digits=2), ", ",apaP(spher$"p[GG]"),sep="")
-               return(paste(fstat, mauchly, sep=" "))
-          } 
-     }
-}
-reportAnovaMod<-function(myList,num=2){
-          fstat=paste("F(",myList$model.all$ANOVA$DFn[num],", ",myList$model.all$ANOVA$DFd[num],")= ",round(myList$model.all$ANOVA$F[num],digits=2), ", ",apaP(myList$model.all$ANOVA$p[num]),sep="")
-          return(fstat)
-}
-reportAnovaCor<-function(myList){
-     return(paste("F(",myList$model.all.rtCorr$ANOVA$DFn[2],", ",myList$model.all.rtCorr$ANOVA$DFd[2],")=",round(myList$model.all.rtCorr$ANOVA$F[2],digits=2), ", ",apaP(myList$model.all.rtCorr$ANOVA$p[2]),sep="",collapse=" "))
-}
+###
+#BETWEEN GROUP RESULTS
+###
+subset=useTableCor[test.phase=='F4' & same.letters=="full.alternation" & whereTo=='Arena' & JmenoOrientacnihoBodu %in% c("AI Character","Mezi-cily"),]
+MIDresultsF4.B.A<-doAnovaAcross(subset)
 
-reportRTDistanceCorrelation<-function(myList){
-   return(paste("r(",length(myList$subset$reactionTime),") = ", apaCor(cor.test(myList$subset$reactionTime,myList$subset$distance1)$estimate),", ",apaP(cor.test(myList$subset$reactionTime,myList$subset$distance1)$p.value),sep=""))
-}
+subset=rbind(MIDresultsF4.3.T.F$subset,resultsF4.1.T.F$subset)
+MIDresultsF4.B.F<-doAnovaAcross(subset)
+
+subset=useTableCor[test.phase=='F5' & same.letters=="full.alternation" & whereTo=='Arena' & JmenoOrientacnihoBodu == "Mezi-cily",]
+MIDresultsF5.B.A<-doAnovaAcross(subset)
+
+subset=rbind(MIDresultsF5.3.T.F$subset,resultsF5.1.T.F$subset)
+MIDresultsF5.B.F<-doAnovaAcross(subset)

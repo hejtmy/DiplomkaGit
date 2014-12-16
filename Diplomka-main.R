@@ -6,7 +6,8 @@ library(ez)
 library(car)
 
 #options(contrasts=c("contr.sum","contr.poly"))
-
+dir="U:/Vyzkum/Diplomka/data/Unity/"
+files = list.files(dir, full.names = T)
 #loads functions
 #doesnt work, has to be run manually
 loadVer1<-function(){
