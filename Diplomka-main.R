@@ -1,4 +1,5 @@
-setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+#setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+setwd("c:/users/lukáš/vyzkum/diplomka/diplomkagit")
 library(ggplot2)
 library(data.table)
 library(plyr)
@@ -11,13 +12,18 @@ files = list.files(dir, full.names = T)
 #loads functions
 #doesnt work, has to be run manually
 loadVer1<-function(){
+  #directory with all the raw data files from the experiment
      dir="U:/Vyzkum/Diplomka/data/Unity/Ver1All/"
      files = list.files(dir, full.names = T, recursive=T)
+     #function to for add_demographics, read_file and better_log_table
      source("Data-reader.R")
+     #reads in all the LOG tables and binds them by row
      log_table = do.call("rbind",lapply(files, read_file, key="LOG", dir))
+     #same for TEST results
      test_table= do.call("rbind",lapply(files, read_file, key="TEST", dir))
-     test_table<-add_demographics(test_table,"demographicsVer1.txt")
-     log_table<-add_demographics(log_table,"demographicsVer1.txt")
+     test_table<-add_demographics(test_table,"Data/demographicsVer1.txt")
+     log_table<-add_demographics(log_table,"Data/demographicsVer1.txt")
+     
      better_log_table(log_table)
      source("Data-prep.R")
 }
@@ -29,8 +35,8 @@ loadVer3<-function(){
      source("Data-reader.R")
      log_table = do.call("rbind",lapply(files, read_file, key="LOG", dir))
      test_table= do.call("rbind",lapply(files, read_file, key="TEST", dir))
-     test_table<-add_demographics(test_table,"demographicsVer3.txt")
-     log_table<-add_demographics(log_table,"demographicsVer3.txt")
+     test_table<-add_demographics(test_table,"Data/demographicsVer3.txt")
+     log_table<-add_demographics(log_table,"Data/demographicsVer3.txt")
      better_log_table(log_table)
      source("Data-prep.R")
      return(newTable)
@@ -45,19 +51,19 @@ write.table(newTable,"newTableVerAll3.0.txt",sep=";",row.names=F,quote=F)
 # newTable[newid=="116.1" & letter=="C",meanLetterRT:=0.3363560]
 # newTable[newid=="116.1" & letter=="D",meanLetterRT:=0.2881440]
 
-makeMyTable<-function(table,custom.list){
-     table[,mean:=mean(reactionTime),by=custom.list]
-     table[,mean.sem:=sd(reactionTime)/sqrt(nrow(.SD)),by=custom.list]
-     table[,sd:=sd(reactionTime),by=custom.list]
-     table[,nrow:=nrow(.SD),by=custom.list]
-     table[,mean.sem.upper:=mean+1.96*mean.sem]
-     table[,mean.sem.lower:=mean-1.96*mean.sem]
-     return(table)
+makeMyTable<-function(tab,custom.list){
+     tab[,mean:=mean(reactionTime),by=custom.list]
+     tab[,mean.sem:=sd(reactionTime)/sqrt(nrow(.SD)),by=custom.list]
+     tab[,sd:=sd(reactionTime),by=custom.list]
+     tab[,nrow:=nrow(.SD),by=custom.list]
+     tab[,mean.sem.upper:=mean + 1.96*mean.sem]
+     tab[,mean.sem.lower:=mean - 1.96*mean.sem]
+     return(tab)
 }
 
-newTable=fread("newTableVer1.txt",sep=";",header=T,autostart=1)
+newTable=fread("Data/newTableVerAll3.0.txt",sep=";",header=T,autostart=1)
 
-fit.table=makeMyTable(newTable[did.switch !="NA" & test.phase=='F5' & changedGoal!="NA"],c("id","kamilFaktor"))
+fit.table=makeMyTable(newTable[did.switch !="NA" & test.phase=='F3' & changedGoal!="NA"],c("id","kamilFaktor"))
 fit.table=newTable[did.switch !="NA" & test.phase=='F5' & changedGoal!="NA" & same.letters=="full.allternation" & JmenoOrientacnihoBodu=="Mezi-cily"]
 bar=ggplot(fit.table,aes(x=kamilFaktor,y=mean,fill=changedGoal))
 bar+geom_bar(stat='identity',position='dodge') + geom_errorbar(aes(ymax=mean.sem.upper, ymin=mean.sem.lower),position=position_dodge(0.9))
@@ -78,7 +84,16 @@ model=ezANOVA(
      wid=id,
      within=kamilFaktor,
      within_full=.(kamilFaktor),
-     detailed=T,
+     detailed=T
+)
+
+model = ezANOVA(
+    data=useTableCor[did.switch !="NA" & test.phase=='F5' & changedGoal!="NA" & same.letters==T],
+    dv = reactionTime,
+    wid = newid,
+    within = ExpFaktor,
+    between = gender,
+    detailed =  T
 )
 
 sum.table=fit.table[,list(mean=mean(reactionTime)),by=list(kamilFaktor,id)]
@@ -93,7 +108,7 @@ model=ezANOVA(
      within=kamilFaktor,
      within_full=kamilFaktor,
      between=gender,
-     detailed=T,
+     detailed=T
 )
 
 plot=ezPlot(
@@ -104,7 +119,7 @@ plot=ezPlot(
      within_full=kamilFaktor,
      between=gender,
      split=gender,
-     x=kamilFaktor,
+     x=kamilFaktor
 )
 
 stats=ezStats(
@@ -113,7 +128,7 @@ stats=ezStats(
      wid=id,
      within=kamilFaktor,
      within_full=kamilFaktor,
-     between=gender,
+     between=gender
 )
 
 model2=ezANOVA(
@@ -133,7 +148,7 @@ model.gender=ezANOVA(
      within_full=kamilFaktor,
      within_covariates=distance1,
      between=gender,
-     detailed=T,
+     detailed=T
 )
 
 model
