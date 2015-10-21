@@ -54,6 +54,7 @@ better_log_table <-function(table){
           table[,(column):=NULL]
      }
 }
+
 add_demographics<-function(table,filename){
      demograph<-fread(filename,colClasses=c("character","integer","integer","integer","time","integer","character"))
      demograph[,c("V1","maps ID"):=NULL]
