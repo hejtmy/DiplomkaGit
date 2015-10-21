@@ -19,7 +19,7 @@ source("output-helpers.R")
 # newTable[,newid:=paste(id,".",exp.version,sep="",collapse=""),by=.(id,exp.version,test.phase,Faze)]
 
 #newTable=fread("newTableVerAll.txt",sep=";",header=T,autostart=1)
-newTable=fread("newTableVerAll3.0.txt",sep=";",header=T,autostart=1)
+newTable=fread("Data/newTableVerAll3.0.txt",sep=";",header=T,autostart=1)
 #remove one group - too small
 newTable=newTable[!(same.letters==F & exp.version==2)]
 newTable[,newid:=factor(newid)]
@@ -80,7 +80,7 @@ doAnovaThings<-function(subset){
           wid=newid,
           within=ExpFaktor,
           within_full=ExpFaktor,
-          between=gender,
+          between=gender
      )
      
      statsGender=ezStats(
@@ -89,7 +89,7 @@ doAnovaThings<-function(subset){
           wid=newid,
           within=ExpFaktor,
           within_full=ExpFaktor,
-          between=gender,
+          between=gender
      )
      
      statsAll=ezStats(
@@ -97,7 +97,7 @@ doAnovaThings<-function(subset){
           dv=rtCorrected,
           wid=newid,
           within=ExpFaktor,
-          within_full=ExpFaktor,
+          within_full=ExpFaktor
      )
      
      if(subset$same.letters[1]=='full.alternation' & subset$test.phase != 'F3'){
@@ -135,7 +135,7 @@ doAnovaThings<-function(subset){
           x=ExpFaktor,
           bar_width=0.1,
           y_lab="Mean(RT)",
-          x_lab="Condition",
+          x_lab="Condition"
      )
      
     
@@ -146,7 +146,7 @@ doAnovaThings<-function(subset){
           within=ExpFaktor,
           within_full=ExpFaktor,
           between=gender,
-          detailed=T,
+          detailed=T
      )
      model.all=ezANOVA(
           data=subset,
@@ -155,7 +155,7 @@ doAnovaThings<-function(subset){
           within=ExpFaktor,
           within_full=ExpFaktor,
           return_aov=T,
-          detailed=T,
+          detailed=T
      )
      plot.all.rtCorr=ezPlot(
           data=subset[rtCorrected>0],
@@ -166,7 +166,7 @@ doAnovaThings<-function(subset){
           x=ExpFaktor,
           bar_width=0.1,
           y_lab="Mean(Corrected RT)",
-          x_lab="Condition",
+          x_lab="Condition"
      )
      
      model.all.rtCorr=ezANOVA(
@@ -176,7 +176,7 @@ doAnovaThings<-function(subset){
           within=ExpFaktor,
           within_full=ExpFaktor,
           return_aov=T,
-          detailed=T,
+          detailed=T
      )
      
      #creates a nice post.hoc table
@@ -273,7 +273,7 @@ within_full=ExpFaktor,
 within_covariates=distance1,
 between=gender,
 split=gender,
-x=ExpFaktor,
+x=ExpFaktor
 )
 plot.all=ezPlot(
 data=subset,
@@ -282,7 +282,7 @@ wid=newid,
 within=ExpFaktor,
 within_full=ExpFaktor,
 within_covariates=distance1,
-x=ExpFaktor,
+x=ExpFaktor
 )
 model.gender=ezANOVA(
 data=subset,

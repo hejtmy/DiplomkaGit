@@ -79,6 +79,7 @@ addSameColumn<-function(table){
      table[,same.letters:=F]
      table[,id2:=as.numeric(id)]
      #log_table[,id2:=as.numeric(levels(log_table$id)[log_table$id])]
+     #all ids of 50 + had same letter design
      table[id2>50,same.letters:=T]
      table[,id2:=NULL] 
      return(table)
