@@ -21,12 +21,12 @@ Tesaøová Monica	19	33	1	10:20	22	F
 Filatova Anastasia	20	35	1	11:40	21	F
 Rusnok Zuzana	21	38	1	11:40	25	F
 Razumòak Daniel	22	40	1	13:00	20	M
-Kmetová Žaneta	23	41	1	13:00	21	F
+Kmetová Žaneta	23	41	1	13:00	21	F	
 KOèová Kateøina	24	43	1	14:20	20	F
 Støádalová Nela	25	44	1	14:20	21	F
 Štverka Adam	26	46	1	15:40	22	M
 Turòová Martina	27	47	1	15:40	20	F
-Neidermaierová TEreza	29	48	1	17:00	19	F
+Neidermaierová Tereza	29	48	1	17:00	19	F
 Bendová Martina	30	49	1	17:00	23	F
 Anna	36	53	1	11:40	19	F
 Kotková Kateøina	37	51	1	13:00	23	F
