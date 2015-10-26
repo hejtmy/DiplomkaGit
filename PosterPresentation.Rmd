@@ -93,16 +93,16 @@ Uhel.F5.1.T$model.all$ANOVA
 
 #Angle to goal reaction times
 ##F3 - F5partial alternation
-```{r, echo=FALSE}
+```{r, echo=FALSE,fig.width=15, fig.height=8}
 TimeAngle.All.1.F$plot.both
 ```
 
 ##Full alternation
 ### F3
-```{r, echo=FALSE}
-TimeAngle.F3.1.F$plot.both
+```{r, echo=FALSE,fig.width=15, fig.height=8}
+TimeAngle.F3.1.T$plot.both
 ```
 ### F4 - F5
-```{r, echo=FALSE}
-TimeAngle.F45.1.F$plot.both
+```{r, echo=FALSE,fig.width=15, fig.height=8}
+TimeAngle.F45.1.T$plot.both
 ```
