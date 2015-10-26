@@ -1,0 +1,144 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{hyperref}
+\usepackage{float}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[export]{adjustbox}
+\usepackage{epstopdf}
+\graphicspath{{images/}}
+\usepackage{xcolor}
+
+\usepackage[a4paper,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{lscape}
+
+%bibliography
+\usepackage[british]{babel}
+\usepackage[babel]{csquotes}
+\usepackage[style=apa,backend=biber]{biblatex}
+\DeclareLanguageMapping{british}{british-apa}
+
+\begin{document}
+<<setup,include=FALSE>>=
+setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+library(ggplot2)
+library(data.table)
+library(plyr)
+library(scales)
+library(ez)
+library(car)
+library(xtable)
+library(knitr)
+opts_chunk$set(tidy = FALSE, cache = TRUE, echo=FALSE, warning=FALSE, message=FALSE,results='hide',include=TRUE)
+source("prep-for-print.R")
+@
+\section{Reaction time and angular distance}
+This last segment will shortly address the issue of angular distance and its possible impact on reaction times. I mentioned previously (see \autoref{sec:controllingfordistance}) that especially during F3, but also during other phases and conditions, the angular distance subjects needed to rotate varied across trials. The common perception is that the larger the angular distance, the longer it takes to cover it. 
+
+\subsection{Test phase F3}
+\autoref{} shows the scatter plot with reaction times from during th F3 test phase being the dependent variable and angular distance from $-180^{\circ}$ to $180^{\circ}$ being the independent. The red line corresponds to the fitted linear model.
+
+\begin{figure}[h!]
+<<fig.width=10,fig.align='center'>>=
+scatter=ggplot(useTableCor[did.switch !="NA" & test.phase=='F3'], aes(x=distance1, y=reactionTime))
+scatter+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)+xlab('Distance')+ylab('Reaction time')
+@
+\caption{Reaction times from the F3 test phases plotted against the angular distance of the goal}
+\label{fig:reactiontimeF3all}
+\end{figure}
+
+The linear model shows a moderate slope, but as is evident from the scatter plot, there is no strict rule or tendency in the data. There is also a notable difference between the two target reference frames depicted in \autoref{fig:reactiontimeF3split}. 
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+scatter=ggplot(useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='Arena'], aes(x=distance1, y=reactionTime))
+scatter+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)+xlab('Distance')+ylab('Reaction time')
+@
+\caption{Arena reference frame target}
+\label{fig:reactiontimeF3arena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+scatter2=ggplot(useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='AI' & exp.version==2], aes(x=distance1, y=reactionTime))
+scatter2+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)+xlab('Distance')+ylab('Reaction time')
+@
+\label{fig:reactiontimeF3figure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption{Effect of the switch split by the target reference frame}
+\label{fig:reactiontimeF3split}
+\end{figure}
+
+The linear models for the arena and the figure are in \autoref{table:reactiontimemodelF3split} and as can be seen, the effect is observable only in the object reference frame. This is very likely due to the effect described previously during the VR experiment. As the angular distance between goals increases, subjects lose track of the object-centered reference frame's (aka. figure) position and axis orientation. Therefore longer reaction times in case of larger angular distances between goals are due to this influence rather than the motor requirements of the task. 
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.55\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='Arena' & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the arena}
+\end{subtable}
+
+\begin{subtable}[b]{0.55\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='AI' & distance1 >=0 ]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the figure}
+\end{subtable}
+\caption{Linear models for the reaction time ~ distance during F3 split by target reference frame}
+\label{table:reactiontimemodelF3split}
+\end{table}
+
+This can be inferred from the results of the linear analysis from the F4 and F5 test phases, where the effect of the distance disappears completely during both experiments (see \autoref{fig:reactiontimemodelF4} and  \autoref{fig:reactiontimemodelF5} ). Even though the angular distances varied during these phases as well, no relationship between the angular distance and the reaction time was observed. This is likely due to the fact that the object-centered reference frame origin was presented and it wasn't required to be searched for. 
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.55\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F4' & whereTo=='AI' & exp.version == 1 & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the figure during F4 in the first experiment}
+\end{subtable}
+
+\begin{subtable}[b]{0.55\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F4' & whereTo=='AI' & exp.version == 2 & JmenoOrientacnihoBodu == "AI Character" & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the figure during F4 in the secondexperiment}
+\end{subtable}
+\caption{Linear models for the reaction time ~ distance during F4 and F5 for the object-centered reference frame}
+\label{table:reactiontimemodelF4}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.55\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F5' & whereTo=='AI' & exp.version == 1 & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the figure during F5 in the first experiment}
+\end{subtable}
+
+\begin{subtable}[b]{0.55\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F5' & whereTo=='AI' & exp.version == 2 & JmenoOrientacnihoBodu == "AI Character" & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the figure during F5 in the second experiment}
+\end{subtable}
+\caption{Linear models for the reaction time ~ distance during F4 and F5 for the object-centered reference frame}
+\label{table:reactiontimemodelF5}
+\end{table}
+
+\paragraph{Discussion} These results provided a reason for the careful interpretation of data during the F3 test phase in the object-centered reference frame, but also demonstrated that the motoric activity and the angular variation did not obscure the observed data from the arena and the object reference frame during F4 and F5.
+\end{document}

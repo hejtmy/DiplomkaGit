@@ -1,0 +1,234 @@
+---
+title: "Thesis - preliminary data"
+author: "Lukas Hejtmanek"
+date: "Monday, November 17, 2014"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+Let's do some data readings
+```{r,echo=F,message=F,warning=F,results='hide'}
+setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+library(ggplot2)
+library(data.table)
+library(plyr)
+library(scales)
+library(ez)
+library(car)
+source("prep-for-print.R")
+```
+
+\section{Demographics}
+
+```{r,echo=FALSE}
+
+dem.table
+
+```
+
+The tables include two distinct groups:
+
+- Those with the posiibility of same goals occuring one after another in F2, F4 and F5
+- Those who never had two same goals in a row
+
+TRUE singnifies that same letters could occur after each other.
+
+Let's have a look at the percentages of correct answers.
+
+Data for the F3 : continuous free turning
+
+```{r, echo=F,message=F,fig.width=15, fig.height=8}
+corrplotF3
+```
+
+Data for the F4 : free turning with orienting to a landmark
+
+```{r, echo=F,,message=F,fig.width=15, fig.height=8}
+corrplotF4
+```
+
+Data for the F5 : 2s delay before giving the goal.
+
+```{r, echo=F,,message=F, fig.width=15, fig.height=8}
+corrplotF5
+```
+
+# First Version of the experiment
+
+Analysis of the First Version of the experiment, therefore the goals fixed to sides.
+
+## Test phase F3
+Test phase F3. Free turning around. Only two conditions. Different goal-same reference frame, diferent-goal-different reference frame.
+
+### statistics
+```{r}
+resultsF3.1.T$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF3.1.T$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF3.1.T$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF3.1.T$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF3.1.T$model.all
+resultsF3.1.T$model.gender
+```
+
+##Test phase F4 - two goals after each other NOT possible
+
+Test phase F4. Free turning around with forced orienting without pause. Only two conditions. Different goal-same reference frame and diferent goal-different reference frame.
+
+### statistics
+```{r}
+resultsF4.1.F$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF4.1.F$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF4.1.F$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF4.1.F$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF4.1.F$model.all
+resultsF4.1.F$model.gender
+```
+
+##Test phase F4 - same goals after each other possible
+
+Test phase F4. Free turning around with forced orienting without pause. All three ocnditions. Different goal-same reference frame, same goal-same reference frame and diferent goal-different reference frame.
+### statistics
+```{r}
+resultsF4.1.T$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF4.1.T$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF4.1.T$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF4.1.T$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF4.1.T$model.all
+resultsF4.1.T$model.gender
+```
+
+##Test phase F5 - same goals after one another NOT possible
+
+Test phase F5 Forced orienting with 2s pause. All three ocnditions. Different goal-same reference frame, same goal-same reference frame and diferent goal-different reference frame.
+
+```{r}
+resultsF5.1.F$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF5.1.F$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF5.1.F$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF5.1.F$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF5.1.F$model.all
+resultsF5.1.F$model.gender
+```
+
+##Test phase F5 - same goals possible
+
+Test phase F5 Forced orienting with 2s pause. All three ocnditions. Different goal-same reference frame, same goal-same reference frame and diferent goal-different reference frame.
+
+### statistics
+```{r}
+resultsF5.1.T$stats
+```
+
+### basic graph
+```{r,echo=F}
+resultsF5.1.T$plot.all
+```
+
+### graph split by gender
+Then group graph of the two conditions split by gender:
+```{r,echo=F}
+resultsF5.1.T$plot.gender
+```
+
+### individuals
+Graph of individual performances:
+```{r,echo=F}
+resultsF5.1.T$plot.singular
+```
+
+###anova table
+Now the Anova table with and without the gender factor:
+```{r,echo=F}
+resultsF5.1.T$model.all
+resultsF5.1.T$model.gender
+```
+
+Now the experimentation begins.
+
+There are several distances we can use for control:
+
+- distance1: this is an angular distance between a goal and player rotation at the time when the task is given. Distance1 has values between -180 to 180 degrees. Negative values are for distances 0-180 degrees to the left, positive 0-180 degrees to the right.
+- distance2: same as above but with the difference that the target position is computed at the time of subject's answer. Distance2 has also values between -180 to 180 degrees. Negative values are for distances 0-180 degrees to the left, positive 0-180 degrees to the right.
+- cumsumAngAbs: absolute value of angular movement of the player up to the point when the answer is given.
+- cumsumLeftAng: absolute value of left angular movement
+- cumsumRightAng: absolute value of right angular movement
+
+WE can control the time subject needs to answer with the movement he needs to make. Simplest form is to presume linear movement of the subjects answer and then simply controll the reaction time by it:
+

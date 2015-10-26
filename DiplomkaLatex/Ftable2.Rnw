@@ -1,0 +1,195 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{hyperref}
+\usepackage{float}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[export]{adjustbox}
+\usepackage{epstopdf}
+\graphicspath{{images/}}
+\usepackage{xcolor}
+
+\usepackage[a4paper,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{lscape}
+
+<<include=FALSE>>=
+library(stargazer)
+library(knitr)
+opts_chunk$set(tidy = FALSE, cache = TRUE, echo=FALSE, warning=FALSE, message=FALSE,results='hide',include=TRUE)
+options(scipen = 1, digits = 3)
+source("U:/Vyzkum/Diplomka/DiplomkaGit/prep-for-print.R")
+@
+
+\begin{document}
+\begin{landscape}
+\begin{table}
+\begin{adjustbox}{width=1.5\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+\multicolumn{7}{c}{Experiment 1} \\ \midrule
+\multicolumn{6}{c}{Partial alternation} \\
+ & \multicolumn{3}{c}{Arena} & \multicolumn{3}{c}{Figure} \\
+ & different.goal 
+ & p-value 
+ & different.reference.frame 
+ & different.goal 
+ & p-value 
+ & different.reference.frame
+
+F3 
+& \Sexpr{resultsF3.1.F.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]} 
+& \Sexpr{apaPtable(resultsF3.1.F.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{resultsF3.1.F.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF3.1.F.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.1.F.F$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{resultsF3.1.F.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} \\
+
+F4 
+& \Sexpr{resultsF4.1.F.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]} 
+& \Sexpr{apaPtable(MIDresultsF4.1.F.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF4.1.F.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF4.1.F.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF4.1.F.F$model.all$ANOVA$p[2])} 
+& \Sexpr{resultsF4.1.F.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}
+\\
+
+F5 
+& \Sexpr{MIDresultsF5.1.F.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]} 
+& \Sexpr{apaPtable(MIDresultsF5.1.F.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF5.1.F.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF5.1.F.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF5.1.F.F$model.all$ANOVA$p[2])} 
+& \Sexpr{resultsF5.1.F.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption[First experiment with partial alternation - summary table]{Comparisons of mean reaction times under experimental conditions with the difference assesed by a pairwise t-test with Bonferroni correction}
+\label{table:comparisonsofmeanvaluesexp1}
+\end{table}
+\begin{table}[h!]
+\begin{adjustbox}{width=1.75\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{@{}ccccccccccc@{}}
+\toprule
+\multicolumn{11}{c}{Experiment 1} \\ \midrule
+\multicolumn{11}{c}{Full alternation} \\
+ & \multicolumn{5}{c}{Arena} & \multicolumn{5}{c}{Figure} \\
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & different.reference.frame 
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & different.reference.frame \\
+
+F3 
+& 
+& 
+& \Sexpr{resultsF3.1.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.1.T.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{resultsF3.1.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& 
+& 
+& \Sexpr{resultsF3.1.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.1.T.F$model.all$ANOVA$p[2])} 
+& \Sexpr{resultsF3.1.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+F4 
+& \Sexpr{MIDresultsF4.1.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF4.1.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF4.1.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF4.1.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF4.1.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF4.1.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{resultsF4.1.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{resultsF4.1.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{resultsF4.1.T.F$postHocTable["different.reference.frame","different.goal"]} 
+& \Sexpr{resultsF4.1.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}
+\\
+
+F5
+& \Sexpr{MIDresultsF5.1.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF5.1.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF5.1.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF5.1.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF5.1.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF5.1.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{resultsF5.1.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{resultsF5.1.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{resultsF5.1.T.F$postHocTable["different.reference.frame","different.goal"]} 
+& \Sexpr{resultsF5.1.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionFirst experiment with full alternation - summary table]{Comparisons of mean reaction times under different conditions with the difference assesed by a pairwise t-test with Bonferroni correction}
+\label{table:comparisonsofmeanvaluesexp1}
+\end{table}
+\begin{table}[h!]
+\begin{adjustbox}{width=1.75\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{@{}ccccccccccc@{}}
+\toprule
+\multicolumn{11}{c}{Experiment 2} \\ \midrule
+\multicolumn{11}{c}{Full alternation} \\
+ & \multicolumn{5}{c}{Arena} & \multicolumn{5}{c}{Figure} \\
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & \multicolumn{1}{c|}{different.reference.frame} 
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & different.reference.frame \\
+ 
+F3 
+& 
+& 
+& \Sexpr{resultsF3.3.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.3.T.A$model.all$ANOVA$p[2])} & \multicolumn{1}{c|}{\Sexpr{resultsF3.3.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+&  
+&  
+& \Sexpr{resultsF3.3.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.3.T.F$model.all$ANOVA$p[2])} &\Sexpr{resultsF3.3.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+F4 
+& \Sexpr{MIDresultsF4.3.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF4.3.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF4.3.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF4.3.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF4.3.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{MIDresultsF4.3.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF4.3.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF4.3.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF4.3.T.F$postHocTable["different.reference.frame","different.goal"]} 
+&\Sexpr{MIDresultsF4.3.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+F5 
+& \Sexpr{MIDresultsF5.3.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF5.3.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF5.3.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF5.3.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF5.3.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{MIDresultsF5.3.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF5.3.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF5.3.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF5.3.T.F$postHocTable["different.reference.frame","different.goal"]} 
+& \Sexpr{MIDresultsF5.3.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\ \bottomrule
+     
+\end{tabular}
+\end{adjustbox}
+\caption[Second experiment with full alternation - summary table]{Comparisons of  mean reaction times under different conditions with the difference assesed by a pairwise t-test with Bonferroni correction}
+\label{table:comparisonsofmeanvaluesexp2}
+\end{table}
+\end{landscape}
+\end{document}

@@ -1,0 +1,400 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{hyperref}
+\usepackage{float}    % for fig.pos='H'
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\graphicspath{{images/}}
+
+\usepackage[a4paper,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{microtype}
+
+\begin{document}
+
+<<setup,include=FALSE>>=
+setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+library(ggplot2)
+library(data.table)
+library(plyr)
+library(scales)
+library(ez)
+library(car)
+library(xtable)
+library(knitr)
+opts_chunk$set(tidy = FALSE, cache = TRUE, echo=FALSE, warning=FALSE, message=FALSE)
+source("prep-for-print.R")
+@
+\chapter{Introduction}
+\section{Indexing}
+
+\subsection{Experiments}
+There are two different experiments:
+\begin{itemize}
+\item \textbf{1}: Hidden goals are fixly attached to AI sides.
+\item \textbf{3}: Hidden goals are always between AI and an assigned tree.
+\end{itemize}
+
+\subsection{Groups}
+The tables include two distinct groups:
+\begin{itemize}
+\item \textbf{full.alternation}: Those with the posiibility of same goals occuring one after another in F4 and F5
+\item \textbf{partial.alternation}: Those who never had two same goals in a row 
+\end{itemize}
+
+\subsection{Test phases}
+And there are three phases in each experiment:
+\begin{itemize}
+\item \textbf{F3}: Free turning around.
+\item \textbf{F4}:  Free turning around with forced orienting without pause.
+\item \textbf{F4}: Forced orienting with 2s pause.
+\end{itemize}
+
+\subsection{conditions}
+Three different conditions are monitored:
+\begin{itemize}
+\item \textbf{same.goal}: Mean reaction time when searching for the same goal
+\item \textbf{diff.goal}:  Mean reaction time when searching for a different goal in the same reference frame
+\item \textbf{diff.reference}: Mean reaction time when searching for a different goal in a different reference frame
+\end{itemize}
+
+\paragraph{Comment} The test phase F3 has only two conditions measured diff.goal,diff.reference frame, as do all subjects in the partial.alternation group.
+
+\subsection{Number of subjects in each group}
+<<results='asis'>>=
+print(xtable(dem.table))
+@
+\subsection{Correct answers}
+
+\begin{figure}[H]
+<<corrplotF3,fig.width=10,out.width='11cm',fig.align='center'>>=
+corrplotF3
+@
+\caption{Data for the F3 : continuous free turning percentages of correct answer in the trial}
+\end{figure}
+
+\begin{figure}[H]
+<<corrplotF4,fig.width=10,out.width='11cm',fig.align='center'>>=
+corrplotF4
+@
+\caption{Data for the F4 : free turning with orienting to a landmark}
+\end{figure}
+
+\begin{figure}[H]
+<<corrplotF5,fig.width=10,out.width='11cm',fig.align='center'>>=
+corrplotF4
+@
+\caption{Data for the F5 : 2s delay before giving the goal}
+\end{figure}
+\chapter{Version 1}
+
+\section{Group with partial.alternation}
+
+\subsection{Test phase F3}
+\subsubsection{Statistics F3 partial alternation}
+<<F3.1.Fstats,results='asis'>>=
+print(xtable(resultsF3.1.F$stats))
+@
+\subsubsection{Graphs F3 partial alternation}
+\begin{figure}[H]
+<<F3.1.Fgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.1.F$plot.all
+@
+\caption{Graphs for reaction time means for all subjects for F3 partial alternation}
+\end{figure}
+\begin{figure}[H]
+<<F3.1.Fgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.1.F$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender for F3 partial alternation}
+\end{figure}
+\subsection{Anova}
+<<F3.1.Fanova,results='asis'>>=
+print(xtable(resultsF3.1.F$model.gender$ANOVA))
+print(xtable(resultsF3.1.F$model.all$ANOVA))
+@
+
+\subsection{Test phase F4 partial alternation}
+\subsubsection{Statistics F4 partial alternation}
+<<F4.1.Fstats,results='asis'>>=
+print(xtable(resultsF4.1.F$stats))
+@
+\subsubsection{Graphs F4 partial alternation}
+\begin{figure}[H]
+<<F4.1.Fgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.1.F$plot.all
+@
+\caption{Graphs for reaction time means for all subjects for F4 partial alternation }
+\end{figure}
+\begin{figure}[H]
+<<F4.1.Fgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.1.F$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender for F4 partial alternation}
+\end{figure}
+\subsection{Anova}
+<<F4.1.Fanova,results='asis'>>=
+print(xtable(resultsF4.1.F$model.gender$ANOVA))
+print(xtable(resultsF4.1.F$model.all$ANOVA))
+@
+
+\subsection{Test phase F5 partial alternation}
+\subsubsection{Statistics F5 partial alternation}
+<<F5.1.Fstats,results='asis'>>=
+print(xtable(resultsF5.1.F$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F5.1.Fgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.1.F$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F5 partial alternation}
+\end{figure}
+\begin{figure}[H]
+<<F5.1.Fgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.1.F$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F5 partial alternation}
+\end{figure}
+\subsection{Anova}
+<<F5.1.Fanova,results='asis'>>=
+print(xtable(resultsF5.1.F$model.gender$ANOVA))
+print(xtable(resultsF5.1.F$model.all$ANOVA))
+@
+
+\section{Group with full.alternation}
+
+\subsection{Test phase F3 full alternation}
+\subsubsection{Statistics F3 full alternation}
+<<F3.1.Tstats,results='asis'>>=
+print(xtable(resultsF3.1.T$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F3.1.Tgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.1.T$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F3 full alternation}
+\end{figure}
+\begin{figure}[H]
+<<F3.1.Tgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.1.T$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F3 full alternation}
+\end{figure}
+\subsection{Anova}
+<<F3.1.Tanova,results='asis'>>=
+print(xtable(resultsF3.1.T$model.gender$ANOVA))
+print(xtable(resultsF3.1.T$model.all$ANOVA))
+@
+
+\subsection{Test phase F4 full alternation}
+\subsubsection{Statistics F4 full alternation}
+<<F4.1.Tstats,results='asis'>>=
+print(xtable(resultsF4.1.T$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F4.1.Tgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.1.T$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F4 full alternation}
+\end{figure}
+\begin{figure}[H]
+<<F4.1.Tgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.1.T$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F4 full alternation}
+\end{figure}
+\subsection{Anova}
+<<F4.1.Tanova,results='asis'>>=
+print(xtable(resultsF4.1.T$model.gender$ANOVA))
+print(xtable(resultsF4.1.T$model.all$ANOVA))
+@
+
+\subsection{Test phase F5 full alternation}
+\subsubsection{Statistics F5 full alternation}
+<<F5.1.Tstats,results='asis'>>=
+print(xtable(resultsF5.1.T$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F5.1.Tgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.1.T$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F5 full alternation}
+\end{figure}
+\begin{figure}[H]
+<<F5.1.Tgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.1.T$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F5 full alternation}
+\end{figure}
+\subsection{Anova}
+<<F5.1.Tanova,results='asis'>>=
+print(xtable(resultsF5.1.T$model.gender$ANOVA))
+#print(xtable(resultsF5.1.T$model.gender$`Mauchly's Test for Sphericity`))
+#print(xtable(resultsF5.1.T$model.gender$resultsF5.1.T$model.all$`Sphericity Corrections`))
+print(xtable(resultsF5.1.T$model.all$ANOVA))
+#print(xtable(resultsF5.1.T$model.all$`Mauchly's Test for Sphericity`))
+#print(xtable(resultsF5.1.T$model.all$resultsF5.1.T$model.all$`Sphericity Corrections`))
+@
+\chapter{Version 3}
+
+\section{Group with partial.alternation}
+
+\subsection{Test phase F3}
+\subsubsection{Statistics F3 partial alternation}
+<<F3.3.Fstats,results='asis'>>=
+print(xtable(resultsF3.3.F$stats))
+@
+\subsubsection{Graphs F3 partial alternation}
+\begin{figure}[H]
+<<F3.3.Fgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.3.F$plot.all
+@
+\caption{Graphs for reaction time means for all subjects for F3 partial alternation}
+\end{figure}
+\begin{figure}[H]
+<<F3.3.Fgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.3.F$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender for F3 partial alternation}
+\end{figure}
+\subsection{Anova}
+<<F3.3.Fanova,results='asis'>>=
+print(xtable(resultsF3.3.F$model.gender$ANOVA))
+print(xtable(resultsF3.3.F$model.all$ANOVA))
+@
+
+\subsection{Test phase F4 partial alternation}
+\subsubsection{Statistics F4 partial alternation}
+<<F4.3.Fstats,results='asis'>>=
+print(xtable(resultsF4.3.F$stats))
+@
+\subsubsection{Graphs F4 partial alternation}
+\begin{figure}[H]
+<<F4.3.Fgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.3.F$plot.all
+@
+\caption{Graphs for reaction time means for all subjects for F4 partial alternation }
+\end{figure}
+\begin{figure}[H]
+<<F4.3.Fgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.3.F$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender for F4 partial alternation}
+\end{figure}
+\subsection{Anova}
+<<F4.3.Fanova,results='asis'>>=
+print(xtable(resultsF4.3.F$model.gender$ANOVA))
+print(xtable(resultsF4.3.F$model.all$ANOVA))
+@
+
+\subsection{Test phase F5 partial alternation}
+\subsubsection{Statistics F5 partial alternation}
+<<F5.3.Fstats,results='asis'>>=
+print(xtable(resultsF5.3.F$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F5.3.Fgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.3.F$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F5 partial alternation}
+\end{figure}
+\begin{figure}[H]
+<<F5.3.Fgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.3.F$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F5 partial alternation}
+\end{figure}
+\subsection{Anova}
+<<F5.3.Fanova,results='asis'>>=
+print(xtable(resultsF5.3.F$model.gender$ANOVA))
+print(xtable(resultsF5.3.F$model.all$ANOVA))
+@
+
+\section{Group with full.alternation}
+
+\subsection{Test phase F3 full alternation}
+\subsubsection{Statistics F3 full alternation}
+<<F3.3.Tstats,results='asis'>>=
+print(xtable(resultsF3.3.T$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F3.3.Tgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.3.T$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F3 full alternation}
+\end{figure}
+\begin{figure}[H]
+<<F3.3.Tgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF3.3.T$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F3 full alternation}
+\end{figure}
+\subsection{Anova}
+<<F3.3.Tanova,results='asis'>>=
+print(xtable(resultsF3.3.T$model.gender$ANOVA))
+print(xtable(resultsF3.3.T$model.all$ANOVA))
+@
+
+\subsection{Test phase F4 full alternation}
+\subsubsection{Statistics F4 full alternation}
+<<F4.3.Tstats,results='asis'>>=
+print(xtable(resultsF4.3.T$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F4.3.Tgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.3.T$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F4 full alternation}
+\end{figure}
+\begin{figure}[H]
+<<F4.3.Tgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF4.3.T$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F4 full alternation}
+\end{figure}
+\subsection{Anova}
+<<F4.3.Tanova,results='asis'>>=
+print(xtable(resultsF4.3.T$model.gender$ANOVA))
+print(xtable(resultsF4.3.T$model.all$ANOVA))
+@
+
+\subsection{Test phase F5 full alternation}
+\subsubsection{Statistics F5 full alternation}
+<<F5.3.Tstats,results='asis'>>=
+print(xtable(resultsF5.3.T$stats))
+@
+\subsubsection{Graphs}
+\begin{figure}[H]
+<<F5.3.Tgraph.all,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.3.T$plot.all
+@
+\caption{Graphs for reaction time means for all subjects F5 full alternation}
+\end{figure}
+\begin{figure}[H]
+<<F5.3.Tgraph.gender,fig.width=10,out.width='11cm',fig.align='center'>>=
+resultsF5.3.T$plot.gender
+@
+\caption{Graphs for reaction time means for all subjects split by gender F5 full alternation}
+\end{figure}
+\subsection{Anova}
+<<F5.3.Tanova,results='asis'>>=
+print(xtable(resultsF5.3.T$model.gender$ANOVA))
+#print(xtable(resultsF5.3.T$model.gender$`Mauchly's Test for Sphericity`))
+#print(xtable(resultsF5.3.T$model.gender$resultsF5.3.T$model.all$`Sphericity Corrections`))
+print(xtable(resultsF5.3.T$model.all$ANOVA))
+#print(xtable(resultsF5.3.T$model.all$`Mauchly's Test for Sphericity`))
+#print(xtable(resultsF5.3.T$model.all$resultsF5.3.T$model.all$`Sphericity Corrections`))
+@
+
+
+
+\end{document}

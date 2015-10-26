@@ -1,0 +1,1167 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{hyperref}
+\usepackage{float}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[export]{adjustbox}
+\usepackage{epstopdf}
+\graphicspath{{images/}}
+\usepackage{xcolor}
+
+\usepackage[a4paper,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{lscape}
+
+%bibliography
+\usepackage[british]{babel}
+\usepackage[babel]{csquotes}
+\usepackage[style=apa,backend=biber]{biblatex}
+\DeclareLanguageMapping{british}{british-apa}
+\begin{document}
+\chapter{Results}
+
+\section{Reaction times to colours and letters} \label{sec:reactiontimestocouloursandletters}
+<<include=FALSE>>=
+opts_chunk$set(tidy = FALSE, cache = TRUE, echo=FALSE, warning=FALSE, message=FALSE,results='hide',include=TRUE)
+source("U:/Vyzkum/Diplomka/DiplomkaGit/PsychopyColourAnalyse.R")
+options(scipen = 1, digits = 3)
+@ 
+One of the potential issues with the VR experiment could have been the interaction between letter, colour and the simple reaction task. Because goals in the VR were presented as coloured letters, it is necessary to evaluate this interaction and determine whether the task of reacting to the shape and colour is independent of subjects. If there was a significant influence of either of those properties on observed reaction times (e.g. subject was reacting faster in response to A than in response to C, or to green than to yellow) the data gathered in the virtual reality could be obscured by this phenomenon and would need to be corrected. 
+
+I performed one way repeated ANOVA over the whole sample and then analysed each subject separately in order to detect possible individual differences which, although confounded in the overall model, could prove detrimental during the VR analysis.
+
+Each subject had been assigned a random sequence of colour-letter combination, leading to a total of 24 different combinations. Therefore the colour-letter interaction effect could not be measured by repeated ANOVA due to a small number of people in each group (1-3). 
+
+\paragraph{Descriptives}
+Total of \Sexpr{length(subjects)} subjects had their reaction times measured. Only trials with reaction times under one second were analysed. This was a protective measure taken in order to remove effects of other influences, such as momentary loss of attention or occasional mispress of the key. This led to \Sexpr{num.deleted} trials out of \Sexpr{num.trials} being excluded.
+
+\subsection{Effect of colour}
+\autoref{table:descriptivescolourall} shows the mean values, standard deviations and Fisher's Least Significant Difference for each colour. A one way repeated ANOVA with colour of the letter as condition showed no significant effect of colour with F(\Sexpr{model.colour$ANOVA$DFn}, \Sexpr{model.colour$ANOVA$DFd})=\Sexpr{model.colour$ANOVA$F}, p=\Sexpr{model.colour$ANOVA$p}. 
+<<results='asis'>>=
+print(xtable(stats.colour[,-2],label='table:descriptivescolourall',caption='Descriptive statistics',digits=4),include.rownames=FALSE)
+@
+
+\subsection{Effect of letters}
+\autoref{table:descriptivesletterall} shows the mean values, SD and Fisher's Least Significant Difference for the letter condition. A one way repeated ANOVA with the letter as a condition showed no effect with F(\Sexpr{model.letter$ANOVA$DFn}, \Sexpr{model.letter$ANOVA$DFd})=\Sexpr{model.letter$ANOVA$F}, p=\Sexpr{model.letter$ANOVA$p}. 
+
+<<results='asis'>>=
+print(xtable(stats.letter[,-2],label='table:descriptivesletterall',caption='Descriptive statistics',digits=4),include.rownames=FALSE)
+@
+
+\subsection{Individual differences}
+
+Because I was analysing the VR data with repeated anova models which considers intersubject variability, the conclusion that there was no significant effect overall is not sufficient. Firstly, the analysis were conducted on all subjects regardless of the random condition they were assigned to, thus neglecting the interaction property, where the colour and the letter always appear together. If the effect of colour or letter was not significant overall, but their interaction was strong in certain individuals, it could potentially deform the statistical analysis in the VR experiment. 
+When we look at the \autoref{fig:colourindividual}) representing individual performances over the course of this experiment, we can clearly see some interindividual effects in play. 
+
+\begin{figure}[h!]
+<<fig.width=10,out.width='11cm',fig.align='center'>>=
+plot.colour.singular
+@
+\caption[Effect of colour on individual reaction times]{Mean reaction times for each individual subject for each colour}
+\label{fig:colourindividual}
+\end{figure}
+
+As was mentioned previously, the problem with studying the letter-colour interaction with these data is that each letter-colour combination was presented to 4 subjects at maximum, leading to very small sample sizes. Therefore only analysis for each subject separately could indicate, whether the effect was strong individually.
+
+Total of \Sexpr{nrow(different.colour)} subjects showed significant effect of colour-letter interaction in their reaction times in repeated measures ANOVA and thus I decided to make some corrections in the VR analysis, in order to lessen the effect of the task. These corrections were described in \autoref{sec:controllcolourletter}.
+
+\section{Virtual Reality Experiment 1}
+<<include=FALSE>>=
+source("U:/Vyzkum/Diplomka/DiplomkaGit/prep-for-print.R")
+@ 
+
+The first version of the experiment was administered to \Sexpr{length(unique(newTable[exp.version==1,id]))} participants, out of which \Sexpr{length(unique(newTable[exp.version==1 & same.letters=='partial.alternation',id]))} were administered the partial alternation sequence and \Sexpr{length(unique(newTable[exp.version==1 & same.letters=='full.alternation',id]))} the full alternation. Just to recapitulate, full alternation meant that same goals could appear after each other in test phases F4 and F5. \autoref{table:numbersubjectsVR} shows how many subjects were present in each group with some basic demographics.
+
+\begin{table}[h!]
+\begin{adjustbox}{width=1\textwidth,totalheight=\textheight,keepaspectratio}
+<<results='asis'>>=
+latex(dem.table1)
+@ 
+\end{adjustbox}
+\caption[Demographics for the first experiment]{Frequency of subjects in each alternation group during the first experiment with gender and age information}
+\label{table:numbersubjectsVR}
+\end{table}
+
+\subsection{Partial alternation}
+This version of the experiment compared two situations. Response times to a different goal in the same reference frame and response times to a different goal in the different reference frame. The main question was whether locating a goal in a different representation causes longer reaction times than just searching for a different goal. This would effectively mean that goals across these reference frames are not accessed equally, and as hypothesized, they are stored separately and these representations cannot be retrieved at the same time.
+
+\subsubsection{Descriptives} 
+Firstly the adeptness of participants to fulfill the requirements of the task was assessed based on the process described in \autoref{par:correctincorrectanswer}. Only data from those participants who had more than seventy-five percent of correct answers and less than ten percent of clear errors in the appropriate test phase were analysed. \autoref{fig:correct1partial} depicts the percentage of all three types of answers in all three test phases.
+
+\begin{figure}[h!]
+<<fig.width=10,fig.align='center'>>=
+corrplot.1.partial
+@
+\caption[Ratios of correct answers in the first experiment with partial alternation]{Ratios of correct, incorrect and inconclusive answers in each test phase for each participant. Black horizontal line signifies the seventy-five percent mark of correct answers}
+\label{fig:correct1partial}
+\end{figure}
+
+\paragraph{Graphs} All the graphs feature Fisher's Least Significant Difference error bars for the within factors only.
+
+\subsubsection{Test phase F3}
+\autoref{table:resultsF3.1.Fdescriptives} shows descriptive statistics for the sample. \autoref{fig:resultsF3.1.Fplots} presents the overall effect of the tested condition on reaction times for the whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(resultsF3.1.F$descr.table)
+@
+\caption[First experiment - partial alternation, F3 descriptives]{Descriptives of reaction times for F3 phase of the first experiment with partial alternation}
+\label{table:resultsF3.1.Fdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.F$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF3.1.Fplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.F$plot.gender
+@
+\label{fig:resultsF3.1.Fplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[First experiment - partial alternation, F3 plots]{Mean reaction times in test phase F3 during the first experiment with partial alternation}
+\label{fig:resultsF3.1.Fplots}
+\end{figure}
+
+We can see that the reaction times are longer when subjects need to change reference frames. This effect was assessed by pairwise t-test which revealed \Sexpr{reportAnovaCor(resultsF3.1.F)}.
+
+\paragraph{Specific reference frame effect} Besides the overall effect, I was also interested in how the condition affects the reaction times across the two different reference frames. In other words, I analysed whether the effect can be only observed when switching from the figure's object-centred to the arena's allocentric one, or whether the switch occurs regardless of the target reference frame. Separate analysis is also important as the way these reference frames are presented in the F3 phase differ. Even though the figure moves rather predictably, it vanishes from the view, whereas subjects have always some indication about their orientation inside the arena. If the effect of reference frame switch would occur only when switching from arena to the figure, the delay in reaction times could be explained by the necessity to find the figure, not by the need to access different representation. \autoref{fig:resultsF3.1.Fplotssplit} depicts the mean reaction times split by the target reference frame.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.F.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF3.1.Fplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.F.F$plot.all
+@
+\label{fig:resultsF3.1.Fplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[First experiment - partial alternation, F3 plots split by target reference frame]{Mean reaction times during F3 of the first experiment with partial alternation split by target reference frame}
+\label{fig:resultsF3.1.Fplotssplit}
+\end{figure}
+
+We can see that the effect of reference frame switch can be observed in both target representations. Pairwise t-test for the arena as a target yields \Sexpr{reportAnovaCor(resultsF3.1.F.A)}  and the test for the figure's reference frame as a target gives \Sexpr{reportAnovaCor(resultsF3.1.F.F)}. The effect is stronger in the figure's reference frame, supposedly because of the reasons presented above. But the delay can be observed in both reference frames.
+
+\subsubsection{Test phase F4}
+
+\autoref{table:resultsF4.1.Fdescriptives} shows descriptive statistics for the sample. \autoref{fig:resultsF4.1.Fplots} display the effect of the tested condition on reaction times for the whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(MIDresultsF4.1.F$descr.table)
+@
+\caption[First experiment - partial alternation, F4 descriptives]{Descriptives of reaction times for F4 phase of the first experiment with partial alternation}
+\label{table:resultsF4.1.Fdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.1.F$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF4.1.Fplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.1.F$plot.gender
+@
+\label{fig:resultsF4.1.Fplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[First experiment - partial alternation, F4 plots]]{Mean reaction times in test phase F4 during the first experiment with partial alternation}
+\label{fig:resultsF4.1.Fplots}
+\end{figure}
+
+We can see that the reaction times were again longer when subjects needed to change reference frames. This effect was assessed with pairwise t-test which revealed \Sexpr{reportAnovaCor(MIDresultsF4.1.F)}.
+
+\paragraph{Specific reference frame effect} Just like in previous phase, we can monitor the effect of the target reference frame. The \autoref{fig:resultsF4.1.Fplotssplit} show the plotted mean reaction times in the two target representations.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.1.F.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF4.1.Fplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF4.1.F.F$plot.all
+@
+\label{fig:resultsF4.1.Fplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[First experiment - partial alternation, F3 plots split by target reference frame]{Mean reaction times during F4 of the first experiment with partial alternation split by target reference frame}
+\label{fig:resultsF4.1.Fplotssplit}
+\end{figure}
+
+The t-test for arena reference frame yields \Sexpr{reportAnovaCor(MIDresultsF4.1.F.A)}  and the test for the figure's reference frame provides \Sexpr{reportAnovaCor(resultsF4.1.F.F)}. This analysis demonstrates that during the disorientation phase the effect of changing representation can be reported as significant only for the object-centred reference frame. This can be for number of reasons elaborated in discussion. 
+
+\subsubsection{Test phase F5}
+\autoref{table:resultsF5.1.Fdescriptives} shows descriptive statistics for the sample and \autoref{fig:resultsF5.1.Fplots} present the effect of the tested condition on reaction times the whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(MIDresultsF5.1.F$descr.table)
+@
+\caption[First experiment - partial alternation, F5 descriptives]{Descriptives of reaction times for F5 phase of the first experiment with partial alternation}
+\label{table:resultsF5.1.Fdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.1.F$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF5.1.Fplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.1.F$plot.gender
+@
+\label{fig:resultsF5.1.Fplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[First experiment - partial alternation, F5 plots]]{Mean reaction times in test phase F5 during the first experiment with partial alternation}
+\label{fig:resultsF5.1.Fplots}
+\end{figure}
+
+We can see that the reaction times are again longer when subjects need to change reference frames. This effect was assessed by pairwise t-test which reported \Sexpr{reportAnovaCor(MIDresultsF5.1.F)}.
+
+\paragraph{Specific reference frame effect}  \autoref{fig:resultsF5.1.Fplotssplit} shows the plotted reaction times in the two separate target representations. 
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.1.F.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF5.1.Fplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF5.1.F.F$plot.all
+@
+\label{fig:resultsF5.1.Fplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[First experiment - partial alternation, F5 plots split by target reference frame]{Mean reaction times during F5 of the first experiment with partial alternation split by target reference frame}
+\label{fig:resultsF5.1.Fplotssplit}
+\end{figure}
+
+Unlike the previous phase, this time both the arena [\Sexpr{reportAnovaCor(MIDresultsF5.1.F.A)}] and the object-centred target reference frames [\Sexpr{reportAnovaCor(resultsF5.1.F.F)}] reported significant effect of the reference frame switch.
+
+\subsection{Discussion}
+Partial randomisation design allowed me to directly compare two sets of subjects' response times: reaction times needed to locate a different goal in the same representation and reaction time needed to locate a different goal in the different representation. Generally there was a delay when the reference frame or representation needed to change. This couldn't be attributed to either angular distance needed to achieve the correct heading, nor the inter-individual effect of the letter-colour preference. These outcomes are consistent with previous research indicating the sequential access of discrete spatial representations, but there were also results challenging this view.
+
+We should closely observe the differences between the object-centred representation and the landmark-centred representation. We could assume, that the task of locating the goal in the object-centred reference frame is slightly more difficult, as can be seen in \autoref{table:correctans1bytask}. It requires not only spatial decision, but also object recognition and assessment of its internal axis based on its movement and visual appearance. But even though the task was harder, the reaction times to the dynamic goals were consistently shorter with the exception of switching from the arena to the figure in F3. This was the reason for the analysis of the angular distance to the goal and reaction time, but it proved, at least linearly, inconclusive (see \autoref{sec:reactiontimesangulardistance}). 
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(tabular((Target=factor(whereTo))~(Answer=factor(correct.ans)), newTable[exp.version==1 & same.letters=='partial.alternation']))
+@
+\caption{Ratio of correct answers in test phase during the first experiment}
+\label{table:correctans1bytask}
+\end{center}
+\end{table}
+
+Whereas the figure manifested this effect throughout the experiment, the arena representation displayed no significant delay in F4. This is important to notice, as the time needed to locate goal in the object-centered reference frame after switching from the arena can be easily explained by the need to find the object and to determine its heading, not due to a representation switch. Therefore if the effect was significant only in the figure's reference frame, it would not support the hypothesis. On the other hand, if the effect of the reference frame switch was found in all test phases when switching to the arena, the results would be consistent with the hypothesis. Because landmarks on the arena are always visible and static, being oriented in the object-centred representation should not prevent subjects from being oriented in the arena as well. Even though the data suggest such effect in F4, it was not found statistically significant, while the effect of the reference frame switch was found significant in all other instances.
+
+An interesting resolution of this problem could be found in \textcite{Brockmole2002}. Brockmole suggested that the switch between the representations occurs under two seconds. Therefore if we give subjects this much time after cueing the task but prior to specifying the goal, there wouldn't be an observable effect. And if we look at the mean times during F4 in the arena reference frame, they were larger than two seconds, whereas figure's were not. Thus even though not by design, subjects had indeed time to process the switch. In other words because the task was relatively hard and all answers were given after the two second mark, subjects had more time to think in parallel to their actions. But the data from the F5 suggest that this is not the case. 
+
+According to the previous paragraph, the effect should not occur if subjects had had time prior to the task and could reorient themselves in the appropriate reference frame. Because the effect was observable in F5, it seems that 2000ms is not enough for such reorientation, as the provided 3000ms delay was did not lessen the effect for this particular group. I shall address this later in the following sections.
+
+Objection to this experiment could be towards the goal sequence randomisation design. Because two goals could not follow each other, there was a possibility of predicting which goal would come up next. This was especially troublesome in the F5 orientation phase, when subjects had three seconds to think. When subjects were oriented towards the middle tree, which sided both arena goals, then based on previous goal it could be deduced which one would come next. This was not a problem in F3, where no orientation was forced, and possibly neither in F4, which was fast paced and highly disorienting. But the impact of this possibly unconscious prediction could obfuscate the results. Therefore a second version with full alternation design was administered.
+
+\subsection{Full alternation}
+This version of the experiments compared three conditions. Response times to the same goal, to the different goal in the same reference frame and to a different goal in a different reference frame.
+
+\subsubsection{Descriptives} 
+As in the partial alternation group, subjects were pre selected for the analysis based on their performance. Only data from those participants who had more than seventy-five percent of correct answers and less than ten percent of errors in the appropriate test phase were analysed. \autoref{fig:correct1full} shows the ratios of all three types of answers in all three test phases per subject
+
+\begin{figure}[h!]
+<<fig.width=10,fig.align='center'>>=
+corrplot.1.full
+@
+\caption[Ratios of correct answers in the first experiment with full alternation]{Ratio of correct, incorrect and inconclusive answers in each test phase for each participant. Black horizontal line signifies the 75 percent mark of correct answers}
+\label{fig:correct1full}
+\end{figure}
+
+\subsubsection{Test phase F3}
+Because of the reasons mentioned in \autoref{sec:testphaseF3}, I had not allowed two same goals to occur after each other in this phase. Thus the F3 test phase was effectively the same as in the partial alternation group. But because the training was quite different and longer in full alternation, I decided to analyse them separately.
+
+\autoref{table:resultsF3.1.Tdescriptives} shows descriptive statistics for the sample. \autoref{fig:resultsF3.1.Tplots} present the effect of the tested condition on reaction times for the whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(resultsF3.1.T$descr.table)
+@
+\caption[First experiment - full alternation, F3 descriptives]{Descriptives of reaction times for F3 phase of the first experiment with full alternation}
+\label{table:resultsF3.1.Tdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.T$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF3.1.Tplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.T$plot.gender
+@
+\label{fig:resultsF3.1.Tplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[First experiment - full alternation, F3 plots]]{Mean reaction times in test phase F3 during the first experiment with full alternation}
+\label{fig:resultsF3.1.Tplots}
+\end{figure}
+
+We can see that the reaction times are again longer when the change of reference frames was required by the task. This effect was assessed by a pairwise t-test which revealed \Sexpr{reportAnovaCor(resultsF3.1.T)}.
+
+\paragraph{Specific reference frame effect} Separation of the two cases shows that the effect was strong when switching to the arena with \Sexpr{reportAnovaCor(resultsF3.1.T.A)}  and also when switching to the figure's reference frame \Sexpr{reportAnovaCor(resultsF3.1.T.F)}.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.T.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF3.1.Tplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.1.T.F$plot.all
+@
+\label{fig:resultsF3.1.Tplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[First experiment - full alternation, F3 plots split by target reference frame]{Mean reaction times during F3 of the first experiment with full alternation split by target reference frame}
+\label{fig:resultsF3.1.Tplotssplit}
+\end{figure}
+
+\subsubsection{Test phase F4}
+\autoref{table:resultsF4.1.Tdescriptives} shows again descriptive statistics for the sample. \autoref{fig:resultsF4.1.Tplots} presents the means plotted for whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+\begin{adjustbox}{width=1\textwidth,totalheight=\textheight,keepaspectratio}
+<<results='asis'>>=
+latex(MIDresultsF4.1.T$descr.table)
+@
+\label{table:resultsF4.1.Tdescriptives}
+\end{adjustbox}
+\caption[First experiment - full alternation, F4 descriptives]{Descriptives of reaction times for F4 phase of the first experiment with full alternation}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.1.T$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF4.1.Tplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.1.T$plot.gender
+@
+\label{fig:resultsF4.1.Tplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[First experiment - full alternation, F4 plots]{Mean reaction times in test phase F4 during the first experiment with full alternation}
+\label{fig:resultsF4.1.Tplots}
+\end{figure}
+
+ANOVA for the condition was significant [\Sexpr{reportAnovaCor(MIDresultsF4.1.T)}], but because three conditions were measured, post hoc tests are required to determine which conditions differed from each other. P-values for pairwise t-tests with Bonferroni correction are in \autoref{table:resultsF4.1.Tposthoc}.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+print(xtable(MIDresultsF4.1.T$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption[First experiment - full alternation, F4 post hoc]{Post hoc tests for the F4 phase of the first experiment with full alternations}
+\label{table:resultsF4.1.Tposthoc}
+\end{center}
+\end{table}
+
+This shows that both the switch of a goal and the switch of the arena are all significantly different from each other, therefore the switch to a different reference frame cannot be explained by mere novelty of the goal.
+
+\paragraph{Specific reference frame effect} Just like in previous phase, we can monitor the effect of the target reference frame. \autoref{fig:resultsF4.1.Tplotssplit} shows the plotted reaction times of the two target representations.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.1.T.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF4.1.Tplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF4.1.T.F$plot.all
+@
+\label{fig:resultsF4.1.Tplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[First experiment - full alternation, F4 plots split by target reference frame]{Mean reaction times during F4 of the first experiment with full alternation split by target reference frame}
+\label{fig:resultsF4.1.Tplotssplit}
+\end{figure}
+
+Both analysis of variance reported significant results, with the arena as a target reference frame reporting \Sexpr{reportAnovaCor(MIDresultsF4.1.T.A)}  and the figure's reference frame \Sexpr{reportAnovaCor(resultsF4.1.T.F)}. Post hoc analysis with the p-values obtained by pairwise comparisons with Bonferroni correction are in \autoref{table:resultsF4.1.Tsplitposthoc}.
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(MIDresultsF4.1.T.A$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption{Post hoc tests for the arena}
+\end{subtable}
+
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(resultsF4.1.T.F$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption{Post hoc tests for the figure}
+\end{subtable}
+\caption[First experiment - full alternation, F4 post hoc split by target reference frame]{Post hoc tests for the F4 phase of the first experiment with full alternations split by target reference frame}
+\label{table:resultsF4.1.Tsplitposthoc}
+\end{table}
+
+We can observe the significant effect of changing the reference frame in both the arena as a target and the figure as a target. 
+
+\subsubsection{Test phase F5}
+\autoref{table:resultsF5.1.Tdescriptives} provides descriptive statistics for the sample and \autoref{fig:resultsF5.1.Tplots} present the effect of the tested condition on reaction times for the whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+\begin{adjustbox}{width=1\textwidth,totalheight=\textheight,keepaspectratio}
+<<results='asis'>>=
+latex(MIDresultsF5.1.T$descr.table)
+@
+\end{adjustbox}
+\caption[First experiment - full alternation, F5 descriptives]{Descriptives of reaction times for F5 phase of the first experiment with full alternation}
+\label{table:resultsF5.1.Tdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.1.T$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF5.1.Tplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.1.T$plot.gender
+@
+\label{fig:resultsF5.1.Tplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[First experiment - full alternation, F5 plots]{Mean reaction times in test phase F5 during the first experiment with full alternation}
+\label{fig:resultsF5.1.Tplots}
+\end{figure}
+
+The repeated measures ANOVA gives us \Sexpr{reportAnovaCor(MIDresultsF5.1.T)} and the post hoc p-values for pairwise t-tests with Bonferroni correction are in \autoref{table:resultsF5.1.Tposthoc}.
+
+\begin{table}[h!]
+\centering
+<<results='asis'>>=
+print(xtable(MIDresultsF5.1.T$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption[First experiment - full alternation, F5 post hoc]{Post hoc tests for the F5 phase of the first experiment with full alternations}
+\label{table:resultsF5.1.Tposthoc}
+\end{table}
+
+As the subjects have time to think, there is no significant difference between locating the same goal or the goal in the same reference frame, but we can report the overall effect of the reference frame switch.
+
+\paragraph{Specific reference frame effect} \autoref{fig:resultsF5.1.Tplotssplit} shows the plotted reaction times on the two separate target representations like in previous sections.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.1.T.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF5.1.Tplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF5.1.T.F$plot.all
+@
+\label{fig:resultsF5.1.Tplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[First experiment - full alternation, F5 plots split by target reference frame]{Mean reaction times during F5 of the first experiment with full alternation split by target reference frame}
+\label{fig:resultsF5.1.Tplotssplit}
+\end{figure}
+
+The situation is interestingly different from the F4 and seemingly reversed. Just to recapitulate, during F5 subjects had three seconds to think about the possible goals based on the cued orientation landmark. This made the time difference between same goal and different goal conditions smaller even in the arena reference frame. The ANOVA for the arena as the target reference frame returns \Sexpr{reportAnovaCor(MIDresultsF5.1.T.A)} and the object-centred target reference frame yields \Sexpr{reportAnovaCor(resultsF5.1.T.F)}. \autoref{table:resultsF5.1.Tsplitposthoc} shows that the significant difference can be found in the different goal versus different reference frame relation in both cases. It means that change of the necessary reference frame leads to longer reaction times, even when subjects have two seconds prior to the task to reflect their options.
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(MIDresultsF5.1.T.A$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption{Post hoc tests for the arena}
+\end{subtable}
+
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(resultsF5.1.T.F$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption{Post hoc tests for the figure}
+\end{subtable}
+\caption[First experiment - full alternation, F5 post hoc split by target reference frame]{Post hoc tests for the F5 phase of the first experiment with full alternations split by target reference frame}
+\label{table:resultsF5.1.Tsplitposthoc}
+\end{table}
+
+\subsection{Discussion}
+
+The full alternation design did not yield much different results than the partial alternation design. There were some minor changes in their significance, but looking at the numbers, this has been mostly due to smaller shifts in means and standard deviations rather than the overall transformations across conditions. Even though not significant, the delay in response times in the different reference frame condition was consistent in both sequence designs and in all test phases. 
+
+But according to \textcite{Brockmole2002} the delay should not occur in the F5 phase. Brockmole argued, that even two second windows should be sufficient for the representations to switch and no difference between different goal and different reference frame should be observed under this condition. These results on the other hand report that the effect of reference frame switch could be observed in F5 in the both sequence designs and in both target reference frames. In the case of the figure's reference frame the explanation could be provided by the necessity to realign its axes and orientation as argued previously, but such explanation is not feasible for the arena reference frame. 
+
+To further research the topic but without the orientation-dependent axes, second version of the goal distribution was administered.
+
+\section{Virtual reality experiment 2}
+
+The second version of the experiment used very different dynamic goal positioning, with goal being defined by both the figure and the static landmarks as well. For clarity and readability I will refer to the pseudo-object-centred reference frame as the figure's one, even though it is determined by multiple non figure objects. 
+
+This version was administered to \Sexpr{length(unique(newTable[exp.version==2,id]))} participants. Only the full alternation design was used. \autoref{table:numbersubjectsVR2} displays some core demographics of the group. Even though the group was smaller, at least each gender was represented fairly equally.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(dem.table2)
+@ 
+\caption[Second experiment demographics]{Gender and age demographics for the second experiment}
+\label{table:numbersubjectsVR2}
+\end{center}
+\end{table}
+
+\paragraph{Correct answers} As in previous sections, only data from those participants who had more than seventy-five percent of correct answers and less than ten percent of wrong answers in the particular test phase were analysed.
+
+\begin{figure}[h!]
+<<fig.width=10,fig.align='center'>>=
+corrplot.2.full
+@
+\caption[Ratios of correct answers in the second experiment with full alternation]{Ratios of correct, incorrect and inconclusive answers in each test phase for each participant. Black horizontal line signifies the seventy-five percent mark of correct answers}
+\label{fig:correct2full}
+\end{figure}
+
+\subsection{Test phase F3}
+
+\autoref{table:resultsF3.3.Tdescriptives} shows descriptive statistics for the sample. \autoref{fig:resultsF3.3.Tplots} monitor the effect of the tested condition on reaction times for both the whole group and split by gender.
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+latex(resultsF3.3.T$descr.table)
+@
+\caption[Second experiment - full alternation, F3 descriptives]{Descriptives of reaction times for F3 phase of the second experiment with full alternation}
+\label{table:resultsF3.3.Tdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.3.T$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF3.3.Tplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.3.T$plot.gender
+@
+\label{fig:resultsF3.3.Tplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[Second experiment - full alternation, F3 plots]{Mean reaction times in test phase F3 during the second experiment with full alternation}
+\label{fig:resultsF3.3.Tplots}
+\end{figure}
+
+We can see that the reaction times are longer when subjects need to change reference frames, and repeated measures anova revealed a significant difference [\Sexpr{reportAnovaCor(resultsF3.3.T)}].
+
+\paragraph{Specific reference frame effect} Separation of the two cases shows that the effect wasn't large enough for either reference frame. The ANOVA for the arena as a target reported  \Sexpr{reportAnovaCor(resultsF3.3.T.A)} and the figure's reference frame yielded \Sexpr{reportAnovaCor(resultsF3.3.T.F)}. We can see that this might be due to small samples, as the switch of a reference frame causes delays in responses, but the deviations are fairly large. 
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.3.T.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF3.3.Tplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.3.T.F$plot.all
+@
+\label{fig:resultsF3.3.Tplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[Second experiment - full alternation, F3 plots split by target reference frame]{Mean reaction times during F3 of the second experiment with full alternation split by target reference frame}
+\label{fig:resultsF3.3.Tplotssplit}
+\end{figure}
+
+\subsubsection{Test phase F4}
+\autoref{table:resultsF4.3.Tdescriptives} shows descriptive statistics for the F4 phase. \autoref{fig:results4.3.Tplotgender} shows plots with mean reaction times for both the whole group as well as split by gender.
+
+\begin{table}[h!]
+\begin{center}
+\begin{adjustbox}{width=1\textwidth,totalheight=\textheight,keepaspectratio}
+<<results='asis'>>=
+latex(MIDresultsF4.3.T$descr.table)
+@
+\end{adjustbox}
+\caption[Second experiment - full alternation, F4 descriptives]{Descriptives of reaction times for F4 phase of the second experiment with full alternation}
+\label{table:resultsF4.3.Tdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.3.T$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF4.3.Tplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.3.T$plot.gender
+@
+\label{fig:resultsF4.3.Tplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[Second experiment - full alternation, F4 plots]{Mean reaction times in test phase F4 during the second experiment with full alternation}
+\label{fig:resultsF4.3.Tplots}
+\end{figure}
+
+We are able to observe similar graphs like in the F4 phase of the previous experiment. The effect assessed by repeated measures ANOVA is significant \Sexpr{reportAnovaCor(MIDresultsF4.3.T)}. As we have three conditions, post hoc tests conducted with the use of pairwise t-tests with Bonferroni correction are reported in \autoref{table:resultsF4.3.Tposthoc}. 
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+print(xtable(MIDresultsF4.3.T$postHocTable), floating=F, sanitize.text.function=identity)
+@
+\caption[Second experiment - full alternation, F4 post hoc]{Post hoc tests for the F4 phase of the second experiment with full alternations}
+\label{table:resultsF4.3.Tposthoc}
+\end{center}
+\end{table}
+
+As can be inferred from the graph and the post hoc tests, only the effect of simple goal change rather than switching representations is observed.
+
+\paragraph{Specific reference frame effect}  \autoref{fig:resultsF4.3.Tplotssplit} shows the plotted reaction times on the two separate target representations.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.3.T.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF4.3.Tplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.3.T.F$plot.all
+@
+\label{fig:resultsF4.3.Tplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[Second experiment - full alternation, F3 plots split by target reference frame]{Mean reaction times during F3 of the second experiment with full alternation split by target reference frame}
+\label{fig:resultsF4.3.Tplotssplit}
+\end{figure}
+
+Both analysis of variance provided us significant results, with the arena as a target reference frame reporting \Sexpr{reportAnovaCor(MIDresultsF4.3.T.A)} and the figure's reference frame \Sexpr{reportAnovaCor(MIDresultsF4.3.T.F)}. The  p-values obtained again by pairwise comparisons with Bonferroni correction are in \autoref{table:resultsF4.3.Tsplitposthoc}. 
+
+The arena reference frame target shows that not only the necessity to change a goal causes delays, but also the need to change a reference frame. Situation is slightly different in the object-centered reference frame as a target, where only the different goal seems to cause response times lagging. This might be due to the requirement of the task, where orientation in both reference frames is required when searching for dynamic goals. Therefore when oriented in the object-centered reference frame and receiving a new goal, subjects need to first locate the appropriate landmark in the arena, leading to slower reaction times. It is also worth noting, that even though the situation is technically quite similar in different goal and different reference frame conditions in the object-centered representation, some delay is observed nonetheless. 
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(MIDresultsF4.3.T.A$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption{Post hoc tests for the arena}
+\end{subtable}
+
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(MIDresultsF4.3.T.F$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption{Post hoc tests for the figure}
+\end{subtable}
+\caption[Second experiment - full alternation, F4 post hoc split by target reference frame]{Post hoc tests for the F4 phase of the second experiment with full alternations split by target reference frame}
+\label{table:resultsF4.3.Tsplitposthoc}
+\end{table}
+
+\subsubsection{Test phase F5}
+\autoref{table:resultsF5.3.Tdescriptives} provides descriptive statistics for the sample and \autoref{fig:resultsF5.3.Tplots} present the mean reaction times for the tested conditions.
+
+\begin{table}[h!]
+\begin{center}
+\begin{adjustbox}{width=1\textwidth,totalheight=\textheight,keepaspectratio}
+<<results='asis'>>=
+latex(MIDresultsF5.3.T$descr.table)
+@
+\end{adjustbox}
+\caption[Second experiment - full alternation, F5 descriptives]{Descriptives of reaction times for F5 phase of the second experiment with full alternation}
+\label{table:resultsF5.3.Tdescriptives}
+\end{center}
+\end{table}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.3.T$plot.all
+@
+\caption{Plot for all subjects}
+\label{fig:resultsF5.3.Tplotall}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.3.T$plot.gender
+@
+\label{fig:resultsF5.3.Tplotgender}
+\caption{Split by gender}
+\end{subfigure}
+\hfill
+\caption[Second experiment - full alternation, F5 plots]{Mean reaction times in test phase F5 during the second experiment with full alternation}
+\label{fig:resultsF5.3.Tplots}
+\end{figure}
+
+ANOVA reports \Sexpr{reportAnovaCor(MIDresultsF5.3.T)}  but the pairwise t-tests with Bonferroni correction in \autoref{table:resultsF5.3.Tposthoc} demonstrate that no effect can be observed in the switch of a reference frame. 
+
+\begin{table}[h!]
+\begin{center}
+<<results='asis'>>=
+print(xtable(MIDresultsF5.3.T$postHocTable),floating=F, sanitize.text.function=identity)
+@
+\caption[Second experiment - full alternation, F5 post hoc]{Post hoc tests for the F5 phase of the second experiment with full alternations}
+\label{table:resultsF5.3.Tposthoc}
+\end{center}
+\end{table}
+
+\paragraph{Specific reference frame effect} \autoref{fig:resultsF5.3.Tplotssplit} show plotted reaction times like in previous sections.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.3.T.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF5.3.Tplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.3.T.F$plot.all
+@
+\label{fig:resultsF5.3.Tplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[Second experiment - full alternation, F5 post hoc split by target reference frame]{Post hoc tests for the F5 phase of the second experiment with full alternations split by target reference frame}
+\label{fig:resultsF5.3.Tplotssplit}
+\end{figure}
+
+The ANOVA for the arena returns \Sexpr{reportAnovaCor(MIDresultsF5.3.T.A)} and the object-centred target reference frame \Sexpr{reportAnovaCor(MIDresultsF5.3.T.F)}. Neither is significant therefore no post hoc tests are reported.
+
+\section{Comparing the two experiments}
+Now that we know what the situation looks like for the two different versions of goal placement, an interesting question is how these two experiments differed. As I have demonstrated that the situation tends to be different for the arena and figure reference frame I will report only plots and models for the data split by the target reference frame. Also, as I have only the data from the full alternation sequence of goals from the second version, only comparison of full alternation data is presented.
+
+\subsection{Test phase F3}
+
+\autoref{resultsF3.Bplotssplit} demonstrates the difference between the data obtained in F3 during the first and second version of the experiment.
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.B.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF3.Bplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+resultsF3.B.F$plot.all
+@
+\label{fig:resultsF3.Bplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[Experiment comparison - full alternation, F3 plots]{Mean reaction times in test phase F3 split by the experiment version}
+\label{fig:resultsF3.Bplotssplit}
+\end{figure}
+
+The two-way repeated ANOVA with one between-factor with two levels (experiment version one and version two) and the experimental condition as a within factor was applied to the data. The arena as a target reference frame yielded significant results for the within-subject factor (different reference frame x diferent goal) [\Sexpr{reportAnovaCorMod(resultsF3.B.A,3)}], but no effect was found in the interaction between the version of the experiment and the factor [\Sexpr{reportAnovaCorMod(resultsF3.B.A, 4)}]. The situation in the figures reference frame was different, with the tested factor yielding significant results across the experimental alterations [\Sexpr{reportAnovaCorMod(resultsF3.B.F,3)}], but as can be inferred from the graph, the interaction between the experiment and the tested condition was also significant [\Sexpr{reportAnovaCorMod(resultsF3.B.F,4)}],.
+
+\paragraph{Discussion}
+The results from the arena's target reference frame are very similar in both experiments, which could have been expected, as the task is virtually the same. Even though the group in the second experiment was quicker overall, the magnitude of the change induced by the test condition was similar. 
+
+But the situation is very different in the object-centered reference frame. Whereas the first experiment required the new intrinsic reference frame to be imposed upon the figure and then used in order to solve the task, in the second experiment this reference frame was interfaced with the arena's and also required no orientation to be assigned or recognized. As can be seen, the average time to locate goals in the figure's representation one after another took subjects slightly longer in the second experiment, but locating a goal after reorienting from the arena was slightly easier. 
+
+During the second experiment knowing the position of one dynamic goal did not mean that subjects knew the position of the other, as both were mutually independent and relied on external reference points. This manifested itself by seemingly longer reaction times in the different goal condition. 
+
+Different goal condition was not as difficult during the first experiment, as the position of one goal effectively hinted the position of the other, therefore once fully oriented, sequential searching for hidden goals inside the object-centered reference frame was relatively easy. But when reorienting from the arena, the situation was more difficult. I discussed previously that the large slope of the first experiment mean difference in tested conditions could be explained by the need to use the intrinsic reference frame and realign figures axes with subjects own heading. In the second experiment this computation was not required, which might explain the moderate difference. 
+
+\subsection{Test phase F4}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.B.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF4.Bplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF4.B.F$plot.all
+@
+\label{fig:resultsF4.Bplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[Experiment comparison - full alternation, F4 plots]{Mean reaction times in test phase F4 split by the experiment version}
+\label{fig:resultsF4.Bplotssplit}
+\end{figure}
+
+\autoref{fig:resultsF3.Bplotssplit} shows the situation in F4. Repeated ANOVA with one within-subject factor (experimental condition) and one between-groups factor with two levels (experiment version one and version two) was applied to the data. The arena as a target reference frame yielded significant results for the within-subject experimental factor (different reference frame vs. diferent goal) [\Sexpr{reportAnovaCorMod(MIDresultsF4.B.A,3)}], but no effect was found in the interaction between the version of the experiment and the factor [\Sexpr{reportAnovaCorMod(MIDresultsF4.B.A, 4)}]. Again the situation was different for the object-centred reference frame which was apparently different. The tested factor reported significant results across the experimental alterations [\Sexpr{reportAnovaCorMod(MIDresultsF4.B.F,3)}], but the interaction between the experiment and the tested condition was also significant  [\Sexpr{reportAnovaCorMod(MIDresultsF4.B.F, 4)}].
+
+\paragraph{Discussion}
+The significant difference in the different goal condition in object-centred representation is worth noticing. Whereas during the first experiment only the reintroduction of the figure after the switch caused significant delay, the situation is reversed in the second experiment. This is likely to be caused by the importance of orientation in the arena reference frame for the task solution during the second experiment, as argued in previous section. 
+
+\subsection{Test phase F5}
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.B.A$plot.all
+@
+\caption{Arena reference frame target}
+\label{fig:resultsF5.Bplotarena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+MIDresultsF5.B.F$plot.all
+@
+\label{fig:resultsF5.Bplotfigure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption[Experiment comparison - full alternation, F5 plots]{Mean reaction times in test phase F5 split by the experiment version}
+\label{fig:resultsF5.Bplotssplit}
+\end{figure}
+
+The repeated ANOVA with one between-group factor and two levels (experiment version one and version two) was applied to the data. The effect of the within-subject condition (different reference frame vs. diferent goal)  could be observed in both cases with the arena data resulting in \Sexpr{reportAnovaCorMod(MIDresultsF5.B.A,3)} and the object-centered reference frame revealing \Sexpr{reportAnovaCorMod(MIDresultsF5.B.F,3)}. But no effect was found in the interaction between the version of the experiment and the factor in either case, arena yielding \Sexpr{reportAnovaCorMod(MIDresultsF5.B.A, 4)} and figure's reference frame as a target \Sexpr{reportAnovaCorMod(MIDresultsF5.B.F,4)}, which suggests that the situation was fairly similar during both experiments.
+
+\paragraph{Discussion}
+The situation for the arena's reference frame seems again quite comparable for both experiments, which is unsurprising given the goals placement was the same. But the situation in the figure's reference frame reflects the situation, where orientation in both environments is needed to solve the task. Generally longer reaction times during the same goal and different goal conditions are results of the possible disorientation this task induces. Even when locating the same goal, the time passed between following tasks changes the setup of the environment by figure's repositioning, therefore participants need to search for the appropriate landmark on the arena once again. Interesting in overall is the delay caused by the reference frame switch in both experiments in both reference frames, even though found not significant in the second experiment.
+
+\section{Reaction time and angular distance} \label{sec:reactiontimesangulardistance}
+This last segment will shortly address the issue of angular distance and its possible impact on reaction times. I mentioned previously (see \autoref{sec:controllingfordistance}) that especially during F3 the angular distance subjects needed to rotate varied across trials. The common perception is that the larger the angular distance, the longer it takes to cover it. 
+
+\subsection{Test phase F3}
+\autoref{figreactiontimeF3all} shows the scatter plot with reaction times from during the F3 test phase being the dependent variable and angular distance from $-180^{\circ}$ to $180^{\circ}$ being the independent. The red line corresponds to the fitted linear model.
+
+\begin{figure}[h!]
+<<fig.width=10,fig.align='center'>>=
+scatter=ggplot(useTableCor[did.switch !="NA" & test.phase=='F3'], aes(x=distance1, y=reactionTime))
+scatter+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)+xlab('Distance')+ylab('Reaction time')
+@
+\caption{Reaction times from the F3 test phases plotted against the angular distance of the goal}
+\label{fig:reactiontimeF3all}
+\end{figure}
+
+The linear model shows a moderate slope, but as is evident from the scatter plot, there is no strict rule or tendency in the data. There is also a notable difference between the two target reference frames depicted in \autoref{fig:reactiontimeF3split}. 
+
+\begin{figure}[h!]
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+scatter=ggplot(useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='Arena'], aes(x=distance1, y=reactionTime))
+scatter+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)+xlab('Distance')+ylab('Reaction time')
+@
+\caption{Arena reference frame target}
+\label{fig:reactiontimeF3arena}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
+<<fig.width=10,fig.align='center'>>=
+scatter2=ggplot(useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='AI'], aes(x=distance1, y=reactionTime))
+scatter2+geom_point()+stat_smooth(aes(group=distance1>0),method="lm",size=1,colour="red",se=F)+xlab('Distance')+ylab('Reaction time')
+@
+\label{fig:reactiontimeF3figure}
+\caption{Figure reference frame target}
+\end{subfigure}
+\hfill
+\caption{Response times plotted against the angular distance of the goal and split by the target reference frame}
+\label{fig:reactiontimeF3split}
+\end{figure}
+
+The linear models for the arena and the figure are in \autoref{table:reactiontimemodelF3split} and as can be seen, the effect is observable only in the object reference frame. This is very likely for the same reason described previously in the VR experiment. As the angular distance between goals increases, subjects lose track of the object-centered reference frame's (aka. figure) position and axis orientation. Therefore longer reaction times in case of larger angular distances between goals can be due to this influence rather than the motor requirements of the task. 
+
+\begin{table}[h!]
+\centering
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='Arena' & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the arena}
+\end{subtable}
+
+\begin{subtable}[b]{0.7\textwidth}
+<<results='asis'>>=
+print(xtable(summary(lm(reactionTime~distance1,useTableCor[did.switch !="NA" & test.phase=='F3' & whereTo=='AI' & distance1 >=0]))), floating=F, sanitize.text.function=identity)
+@
+\caption{Linear model for the figure}
+\end{subtable}
+\caption{Linear models for the reaction time ~ distance during F3 split by target reference frame}
+\label{table:reactiontimemodelF3split}
+\end{table}
+
+The data generally seem to lack any clear order besides the clouds of data point in both the arena reference frame and the object reference frame. This is also likely to be a reason for the linear model to report significant effect. The data points inside these clouds are the result of the experimental trial sequence, not the angular distance per se. When locating goals on the arena the distance between them remains the same $120^{\circ}$, which is a similar situation as during F4 and F5, where the angle was set to $60^{\circ}$. Therefore, the response times to these places are also dependent on the tested condition itself, which confounds the linear model. Only when locating goals during F3 and switching between the reference frames the angle varies in the full range. Situation is very similar in F4 and F5, with small effect of the distance in the object-centered reference frame. 
+
+\paragraph{Discussion} The mouse sensitivity was set relatively high. This effectively means that covering $120^{\circ}$ and $60^{\circ}$ should be a matter of tens of milliseconds. But the linear model claims that each $180^{\circ}$ should add nine tens of a second to the reaction time to the goal in the object-centered reference frame. As subjects are clearly able to cover the distances of $180^{\circ}$ in little over a second and the core of the reaction times to the same goal, eg. $0^{\circ}$  is around one second as well, it seems unlikely that only a distance to cover would cause the observed effect.
+
+Nevertheless, these results provide a reason for a careful interpretation of data from the object-centred reference frame. Unfortunately, no simple statistics can eliminate this effect because the angular distance and the tested conditions are clearly interdependent. This prevents the use of ANCOVA, as eliminating the effect of the distance could increase the chance of false positives.
+
+Luckily, even though this complicates the conclusions drawn from the test phase F3, it is important to note that the angular distances are fairly uniform during F4 and F5. It means that the ANOVA should not be susceptible to their effect. In the arena's reference frame the angular distance to travel is always $60^{\circ}$ regardless of the tested condition, and in the object centered reference frame the distance varies randomly across all conditions, their effect should be virtually eliminated. 
+
+\newpage
+\begin{landscape}
+\begin{table}
+\begin{adjustbox}{width=1.5\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+\multicolumn{7}{c}{Experiment 1} \\ \midrule
+\multicolumn{6}{c}{Partial alternation} \\
+ & \multicolumn{3}{c}{Arena} & \multicolumn{3}{c}{Figure} \\
+ & different.goal 
+ & p-value 
+ & different.reference.frame 
+ & different.goal 
+ & p-value 
+ & different.reference.frame \\
+
+F3 
+& \Sexpr{resultsF3.1.F.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]} 
+& \Sexpr{apaPtable(resultsF3.1.F.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{resultsF3.1.F.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF3.1.F.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.1.F.F$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{resultsF3.1.F.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} \\
+
+F4 
+& \Sexpr{resultsF4.1.F.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]} 
+& \Sexpr{apaPtable(MIDresultsF4.1.F.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF4.1.F.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF4.1.F.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF4.1.F.F$model.all$ANOVA$p[2])} 
+& \Sexpr{resultsF4.1.F.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}
+\\
+
+F5 
+& \Sexpr{MIDresultsF5.1.F.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]} 
+& \Sexpr{apaPtable(MIDresultsF5.1.F.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF5.1.F.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF5.1.F.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF5.1.F.F$model.all$ANOVA$p[2])} 
+& \Sexpr{resultsF5.1.F.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption[First experiment with partial alternation - summary table]{Comparisons of mean reaction times under experimental conditions with the difference assesed by a pairwise t-test with Bonferroni correction}
+\label{table:comparisonsofmeanvaluesexp1}
+\end{table}
+\begin{table}[h!]
+\begin{adjustbox}{width=1.75\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{@{}ccccccccccc@{}}
+\toprule
+\multicolumn{11}{c}{Experiment 1} \\ \midrule
+\multicolumn{11}{c}{Full alternation} \\
+ & \multicolumn{5}{c}{Arena} & \multicolumn{5}{c}{Figure} \\
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & different.reference.frame 
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & different.reference.frame \\
+
+F3 
+& 
+& 
+& \Sexpr{resultsF3.1.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.1.T.A$model.all$ANOVA$p[2])} 
+& \multicolumn{1}{c|}{\Sexpr{resultsF3.1.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& 
+& 
+& \Sexpr{resultsF3.1.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.1.T.F$model.all$ANOVA$p[2])} 
+& \Sexpr{resultsF3.1.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+F4 
+& \Sexpr{MIDresultsF4.1.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF4.1.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF4.1.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF4.1.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF4.1.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF4.1.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{resultsF4.1.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{resultsF4.1.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{resultsF4.1.T.F$postHocTable["different.reference.frame","different.goal"]} 
+& \Sexpr{resultsF4.1.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}
+\\
+
+F5
+& \Sexpr{MIDresultsF5.1.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF5.1.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF5.1.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF5.1.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF5.1.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{resultsF5.1.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{resultsF5.1.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{resultsF5.1.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{resultsF5.1.T.F$postHocTable["different.reference.frame","different.goal"]} 
+& \Sexpr{resultsF5.1.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption[First experiment with full alternation - summary table]{Comparisons of mean reaction times under different conditions with the difference assesed by a pairwise t-test with Bonferroni correction}
+\label{table:comparisonsofmeanvaluesexp1}
+\end{table}
+\begin{table}[h!]
+\begin{adjustbox}{width=1.75\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{@{}ccccccccccc@{}}
+\toprule
+\multicolumn{11}{c}{Experiment 2} \\ \midrule
+\multicolumn{11}{c}{Full alternation} \\
+ & \multicolumn{5}{c}{Arena} & \multicolumn{5}{c}{Figure} \\
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & \multicolumn{1}{c|}{different.reference.frame} 
+ & same.goal 
+ & p-value 
+ & different.goal 
+ & p-value 
+ & different.reference.frame \\
+F3 & 
+& 
+& \Sexpr{resultsF3.3.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.3.T.A$model.all$ANOVA$p[2])} & \multicolumn{1}{c|}{\Sexpr{resultsF3.3.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+&  
+&  
+& \Sexpr{resultsF3.3.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{apaPtable(resultsF3.3.T.F$model.all$ANOVA$p[2])} &\Sexpr{resultsF3.3.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}\\
+
+F4 & \Sexpr{MIDresultsF4.3.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF4.3.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF4.3.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF4.3.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF4.3.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{MIDresultsF4.3.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF4.3.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF4.3.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF4.3.T.F$postHocTable["different.reference.frame","different.goal"]} 
+&\Sexpr{MIDresultsF4.3.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\
+
+F5 & \Sexpr{MIDresultsF5.3.T.A$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF5.3.T.A$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF5.3.T.A$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF5.3.T.A$postHocTable["different.reference.frame","different.goal"]} 
+& \multicolumn{1}{c|}{\Sexpr{MIDresultsF5.3.T.A$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]}} 
+& \Sexpr{MIDresultsF5.3.T.F$subset[ExpFaktor=="same.goal",mean(rtCorrected)]} 
+& \Sexpr{MIDresultsF5.3.T.F$postHocTable["different.goal","same.goal"]} 
+& \Sexpr{MIDresultsF5.3.T.F$subset[ExpFaktor=="different.goal",mean(rtCorrected)]}
+& \Sexpr{MIDresultsF5.3.T.F$postHocTable["different.reference.frame","different.goal"]} 
+& \Sexpr{MIDresultsF5.3.T.F$subset[ExpFaktor=="different.reference.frame",mean(rtCorrected)]} \\ \bottomrule
+     
+\end{tabular}
+\end{adjustbox}
+\caption[Second experiment with full alternation - summary table]{Comparisons of  mean reaction times under different conditions with the difference assesed by a pairwise t-test with Bonferroni correction}
+\label{table:comparisonsofmeanvaluesexp2}
+\end{table}
+\end{landscape}
+\end{document}

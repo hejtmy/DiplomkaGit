@@ -1,0 +1,143 @@
+---
+title: "ThesisTables"
+author: "Lukas Hejtmanek"
+date: "Monday, November 24, 2014"
+output: pdf_document
+---
+
+setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r,echo=F,message=F,warning=F, results='hide'}
+setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+library(ggplot2)
+library(data.table)
+library(plyr)
+library(scales)
+library(ez)
+library(car)
+newTableVer1=fread("newTableVer1.txt",sep=";",header=T,autostart=1)
+newTableVer3=fread("newTableVer3.txt",sep=";",header=T,autostart=1)
+newTable=rbind(newTableVer1,newTableVer3)
+newTableVer3=NULL
+newTableVer1=NULL
+newTable[,id:=as.character(id)]
+newTable=cbind(newTable,newid=paste(newTable$id,".",newTable$exp.version,sep="",collpase=""))
+newTable[,newid:=factor(newid)]
+newTable[,kamilFaktor:=factor(kamilFaktor,levels=c("same.goal","dif.goal","dif.reference","NA"))]
+setkey(newTable,newid,exp.version,test.phase)
+newTable[,percentCorrect:=.SD$AnsQuant/nrow(.SD),by=list(newid,test.phase)]
+doAnovaThings<-function(subset){
+     stats=ezStats(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          between=gender,
+     )
+     plot.gender=ezPlot(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          between=gender,
+          split=gender,
+          x=kamilFaktor,
+          bar_width=0.1,
+     )
+     plot.all=ezPlot(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          x=kamilFaktor,
+          bar_width=0.1,
+     )
+     model.gender=ezANOVA(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          between=gender,
+          detailed=T,
+     )
+     model.all=ezANOVA(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          detailed=T,
+     )
+     plot.singular=ggplot(subset[,list(mean=mean(reactionTime)),by=list(newid,kamilFaktor)],aes(y=mean,x=kamilFaktor,group=newid,colour=newid))
+     plot.singular=plot.singular + geom_point() + geom_line()
+     return.list=list("stats"=stats,"plot.all"=plot.all,"plot.gender"=plot.gender,"model.all"=model.all,"model.gender"=model.gender,"plot.singular"=plot.singular)
+     return(return.list)
+     
+}
+doAnovaThingsCovariates<-function(subset){
+     stats=ezStats(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          within_covariates=distance1,
+          between=gender,
+     )
+     plot.gender=ezPlot(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          within_covariates=distance1,
+          between=gender,
+          split=gender,
+          x=kamilFaktor,
+     )
+     plot.all=ezPlot(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          within_covariates=distance1,
+          x=kamilFaktor,
+     )
+     model.gender=ezANOVA(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          within_covariates=distance1,
+          between=gender,
+          detailed=T,
+     )
+     model.all=ezANOVA(
+          data=subset,
+          dv=reactionTime,
+          wid=newid,
+          within=kamilFaktor,
+          within_full=kamilFaktor,
+          within_covariates=distance1,
+          detailed=T,
+     )
+     plot.singular=ggplot(subset[,list(mean=mean(reactionTime)),by=list(newid,kamilFaktor)],aes(y=mean,x=kamilFaktor,group=newid,colour=newid))
+     plot.singular=plot.singular + geom_point() + geom_line()
+     return.list=list("stats"=stats,"plot.all"=plot.all,"plot.gender"=plot.gender,"model.all"=model.all,"model.gender"=model.gender,"plot.singular"=plot.singular)
+     return(return.list)
+     
+}
+subset=useTableCor[test.phase=='F3' & exp.version==1]
+results<-list(doAnovaThings(subset))[[1]]
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
