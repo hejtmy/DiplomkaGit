@@ -1,0 +1,16 @@
+---
+title: "PosterPresentation"
+author: "Lukas Hejtmanek"
+date: "Monday, October 26, 2015"
+output: html_document
+---
+
+```{r}
+source("Poster.R")
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
