@@ -262,7 +262,7 @@ wid=newid,
 within=ExpFaktor,
 within_full=ExpFaktor,
 within_covariates=distance1,
-between=gender,
+between=gender
 )
 plot.gender=ezPlot(
 data=subset,

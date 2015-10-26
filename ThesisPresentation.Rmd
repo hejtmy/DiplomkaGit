@@ -29,7 +29,7 @@ dem.table
 
 The tables include two distinct groups:
 
-- Those with the posiibility of same goals occuring one after another in F2, F4 and F5
+- Those with the posibility of same goals occuring one after another in F2, F4 and F5
 - Those who never had two same goals in a row
 
 TRUE singnifies that same letters could occur after each other.

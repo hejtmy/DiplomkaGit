@@ -1,5 +1,5 @@
-setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
-#setwd("c:/users/luká/vyzkum/diplomka/diplomkagit")
+#setwd("U:/Vyzkum/Diplomka/DiplomkaGit")
+setwd("c:/users/luk�/vyzkum/diplomka/diplomkagit")
 library(ggplot2)
 library(data.table)
 library(plyr)
@@ -24,7 +24,7 @@ newTable[,UhlovaVzdalenostCileAbs:=abs(UhlovaVzdalenostCile)]
 
 setorder(newTable,newid,test.phase,Faze)
 newTable[,percentAns:=.SD$AnsQuant/nrow(.SD),by=list(newid,test.phase)]
-
+useTableAll = newTable[changedGoal!="NA"]
 #use table is only for correct answers, when the goal was changed and the answer was relatively fast
 useTable = newTable[correct.ans=='CORRECT' & changedGoal!="NA" & reactionTime<5]
 #selects only those people who had more then 75 percend of correct answers
@@ -179,6 +179,7 @@ Uhel.All.1.F <- list(doAnovaThingsUhel(subset))[[1]]
 Uhel.All.1.F.Graphs<- list(doBetweenPhasesUhel(subset))[[1]]
 TwoWay.All.1.F<- list(doTwoWayAnova(subset))[[1]]
 
+
 subset=useTableCor[test.phase %in% c('F4','F5') & exp.version==1 & same.letters=="full.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")),]
 Uhel.F45.1.T <-list(doAnovaThingsUhel(subset))[[1]]
 Uhel.F45.1.T.Graphs<- list(doBetweenPhasesUhel(subset))[[1]]
@@ -208,4 +209,12 @@ Uhel.All.1.F <- list(doBetweenPhasesUhel(subset))[[1]]
 subset=useTableCor[test.phase=='F4' & exp.version==1 & same.letters=="partial.alternation" & !(JmenoOrientacnihoBodu %in% c("Cil1-vlevo","Cil2-vpravo")),]
 MIDresultsF4.1.F<-list(doAnovaThingsUhel(subset))[[1]]
 
+subset = useTableAll[exp.version == 1 & same.letters=="partial.alternation"]
+Uhel <- list(doAnovaThingsUhel(subset))[[1]]
 
+subset = useTableAll[test.phase == "F3" & exp.version == 1 & same.letters=="partial.alternation"]
+Uhel.F3 <- list(doAnovaThingsUhel(subset))[[1]]
+subset = useTableAll[test.phase == "F4" & exp.version == 1 & same.letters=="partial.alternation"]
+Uhel.F4 <- list(doAnovaThingsUhel(subset))[[1]]
+subset = useTableAll[test.phase == "F5" & exp.version == 1 & same.letters=="partial.alternation"]
+Uhel.F5 <- list(doAnovaThingsUhel(subset))[[1]]

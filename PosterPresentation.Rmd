@@ -5,7 +5,7 @@ date: "Monday, October 26, 2015"
 output: html_document
 ---
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE,messages=FALSE}
 source("Poster.R")
 ```
 
@@ -92,7 +92,7 @@ Uhel.F5.1.T$model.all$ANOVA
 ```
 
 #Angle to goal reaction times
-##F3 - F5partial alternation
+##F3 - F5 partial alternation
 ```{r, echo=FALSE,fig.width=15, fig.height=8}
 TimeAngle.All.1.F$plot.both
 ```
@@ -102,7 +102,47 @@ TimeAngle.All.1.F$plot.both
 ```{r, echo=FALSE,fig.width=15, fig.height=8}
 TimeAngle.F3.1.T$plot.both
 ```
+
+
 ### F4 - F5
 ```{r, echo=FALSE,fig.width=15, fig.height=8}
 TimeAngle.F45.1.T$plot.both
+```
+
+#Two way anovas
+##Partial alternation
+###F3
+```{r, echo=FALSE,fig.width=15, fig.height=8}
+TwoWay.F3.1.F$plot.all
+```
+Model
+```{r, echo=FALSE}
+TwoWay.F3.1.F$model.all$ANOVA
+```
+
+###F4
+```{r, echo=FALSE,fig.width=15, fig.height=8}
+TwoWay.F4.1.F$plot.all
+```
+Model
+```{r, echo=FALSE}
+TwoWay.F4.1.F$model.all$ANOVA
+```
+
+###F5
+```{r, echo=FALSE,fig.width=15, fig.height=8}
+TwoWay.F5.1.F$plot.all
+```
+Model
+```{r, echo=FALSE}
+TwoWay.F5.1.F$model.all$ANOVA
+```
+
+###F3-F5
+```{r, echo=FALSE,fig.width=15, fig.height=8}
+TwoWay.All.1.F$plot.all
+```
+Model
+```{r, echo=FALSE}
+TwoWay.All.1.F$model.all$ANOVA
 ```
