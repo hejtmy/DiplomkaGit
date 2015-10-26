@@ -5,12 +5,104 @@ date: "Monday, October 26, 2015"
 output: html_document
 ---
 
-```{r}
+```{r, echo=FALSE}
 source("Poster.R")
 ```
 
-You can also embed plots, for example:
+#Angular error after switching to arena and figure
 
+# First experiment
+##Partial alternation
+###F3 - F5
 ```{r, echo=FALSE}
-plot(cars)
+Uhel.All.1.F.Graphs$plot.all
+```
+
+###F3
+Descriptive stats
+```{r, echo=FALSE}
+Uhel.F3.1.F$stats
+```
+Model
+```{r, echo=FALSE}
+Uhel.F3.1.F$model.all$ANOVA
+```
+
+###F4
+Descriptive stats
+```{r, echo=FALSE}
+Uhel.F4.1.F$stats
+```
+Model
+```{r, echo=FALSE}
+Uhel.F4.1.F$model.all$ANOVA
+```
+
+###F5
+Descriptive stats
+```{r, echo=FALSE}
+Uhel.F5.1.F$stats
+```
+Model
+```{r, echo=FALSE}
+Uhel.F5.1.F$model.all$ANOVA
+```
+
+##Full alternation
+
+###F3
+```{r, echo=FALSE}
+Uhel.F3.1.T$plot.all
+```
+
+###F4 - F5
+```{r, echo=FALSE}
+Uhel.F45.1.T.Graphs$plot.all
+Uhel.F45.1.T$model.all$ANOVA
+```
+
+###F3
+Descriptive stats
+```{r, echo=FALSE}
+Uhel.F3.1.T$stats
+```
+Model
+```{r, echo=FALSE}
+Uhel.F3.1.T$model.all$ANOVA
+```
+
+###F4
+Descriptive stats
+```{r, echo=FALSE}
+Uhel.F4.1.T$stats
+```
+Model
+```{r, echo=FALSE}
+Uhel.F4.1.T$model.all$ANOVA
+```
+
+###F5
+Descriptive stats
+```{r, echo=FALSE}
+Uhel.F5.1.T$stats
+```
+Model
+```{r, echo=FALSE}
+Uhel.F5.1.T$model.all$ANOVA
+```
+
+#Angle to goal reaction times
+##F3 - F5partial alternation
+```{r, echo=FALSE}
+TimeAngle.All.1.F$plot.both
+```
+
+##Full alternation
+### F3
+```{r, echo=FALSE}
+TimeAngle.F3.1.F$plot.both
+```
+### F4 - F5
+```{r, echo=FALSE}
+TimeAngle.F45.1.F$plot.both
 ```
